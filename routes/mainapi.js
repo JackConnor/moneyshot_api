@@ -11,5 +11,9 @@ module.exports = function(app){
   app.get('/api/test', function(req, res){
     console.log('yp');
     res.json("boom");
+  });
+
+  app.get('/api/users', function(req, res){
+    res.json({data: "here we go"})
   })
 }
