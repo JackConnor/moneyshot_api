@@ -1,6 +1,7 @@
 var express        = require('express');
 var path           = require('path');
 var dotenv         = require('dotenv').load();
+var cors           = require('cors');
 // var favicon = require('serve-favicon');
 var logger         = require('morgan');
 var cookieParser   = require('cookie-parser');
@@ -16,25 +17,20 @@ var passportlocal = require('passport-local');
 
 var app           = express();
 
-console.log(1);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-console.log(2);
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-console.log(3);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-console.log(4);
 app.use(express.static(path.join(__dirname, 'public')));
-console.log(5);
 /////signup stuff
 app.use(passport.initialize());
 app.use(passport.session());
-console.log(6);
 var router = require('./routes/mainapi.js')(app);
 
 // require('./passport.js')(passport);
@@ -68,18 +64,7 @@ app.use(function(err, req, res, next) {
   });
 });
 
-app.listen(process.env.PORT) //|| '5555' || 80 || 443);
-//////////////////////////////////////////////////////////////////
-// app.listen(options, (req, res) => {
-//   res.writeHead(200);
-//   res.end('hello world\n');
-// }).listen(5555);
-
-// https.createServer(options, (req, res) => {
-//   res.writeHead(200);
-//   res.end('hello world\n');
-// }).listen(5555);
-/////////////////////////////////////////////////////////////////
+app.listen(process.env.PORT || '5555' || 80 || 443);
 
 app.get('*', function(req, res){
 
