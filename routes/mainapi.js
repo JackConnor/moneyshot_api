@@ -19,7 +19,7 @@ module.exports = function(app){
   console.log('here?');
   app.get('/api/test', function(req, res){
     Photo.find({}, function(err, photos){
-      console.log(photos);
+      // console.log(photos);
       res.json(photos);
     })
   })
@@ -47,6 +47,7 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', function(req, res){
+    console.log('yoyoyoyoyoyoy uploading an image');
     console.log(req.body);
     console.log(req.files);
   })
