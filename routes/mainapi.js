@@ -50,6 +50,7 @@ module.exports = function(app){
     console.log('yoyoyoyoyoyoy uploading an image');
     console.log(req.body);
     console.log(req.files);
+    res.json('anyting?')
   })
 
   ///////////////end photo db calls////////////////////
