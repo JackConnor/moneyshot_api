@@ -18,8 +18,10 @@ var Photo       = require('../models/photo.js');
 module.exports = function(app){
   console.log('here?');
   app.get('/api/test', function(req, res){
-    console.log('yp');
-    res.json("boom");
+    Photo.find({}, function(err, photos){
+      console.log(photos);
+      res.json(photos);
+    })
   })
 
   app.get('/api/users/newtest', function(req, res){
@@ -34,6 +36,23 @@ module.exports = function(app){
     })
   })
 
+
+  /////////////////////////////////////////////////////
+  ///////////////begin photo db calls//////////////////
+
+  app.get('/api/allPhotos', function(req, res){
+    Photo.find({}, function(err, allPhotos){
+      res.json(allPhotos);
+    })
+  })
+
+  app.post('/api/newimage', function(req, res){
+    console.log(req.body);
+    console.log(req.files);
+  })
+
+  ///////////////end photo db calls////////////////////
+  /////////////////////////////////////////////////////
 
 }
 
