@@ -1,8 +1,11 @@
-var express = require('express');
-var mongoose       = require('mongoose');
-var bodyParser     = require('body-parser');
-var methodOverride = require('method-override');
-console.log('yo');
+var express           = require('express');
+var mongoose          = require('mongoose');
+var bodyParser        = require('body-parser');
+var methodOverride    = require('method-override');
+var multer            = require('multer');
+var upload = multer({dest: 'uploads/'})
+console.log(multer);
+console.log(upload);
 
 ///////////////////////////////////////////////////
 ///////////Our Models//////////////////////////////
@@ -46,9 +49,10 @@ module.exports = function(app){
     })
   })
 
-  app.post('/api/newimage', function(req, res){
+  app.post('/api/newimage', upload.array('files', 1), function(req, res){
     console.log('yoyoyoyoyoyoy uploading an image');
     console.log(req.body);
+    console.log(req.file);
     console.log(req.files);
     res.json('anyting?')
   })
