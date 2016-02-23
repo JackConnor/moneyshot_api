@@ -68,7 +68,7 @@ module.exports = function(app){
     console.log(filePath);
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       console.log(result)
-      Photo.create({url: result.secure_url, location: 90210, date: new Date(), photosubjects: ['kris jenner'], status: "submitted for sale"}, function(err, newPhoto){
+      Photo.create({url: result.secure_url, location: 90210, date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale"}, function(err, newPhoto){
         console.log(newPhoto);
         res.json(newPhoto);
       })
