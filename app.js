@@ -2,6 +2,8 @@ var express        = require('express');
 var path           = require('path');
 var dotenv         = require('dotenv').load();
 var cors           = require('cors');
+var multer         = require('multer');
+var upload         = multer({dest: 'uploads/'})
 // var favicon = require('serve-favicon');
 var logger         = require('morgan');
 var cookieParser   = require('cookie-parser');
@@ -13,7 +15,7 @@ var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
 var passport       = require('passport');
 var passportlocal = require('passport-local');
-// var cloudinary     = require('cloudinary');
+var cloudinary     = require('cloudinary');
 
 var app           = express();
 

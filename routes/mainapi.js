@@ -3,9 +3,15 @@ var mongoose          = require('mongoose');
 var bodyParser        = require('body-parser');
 var methodOverride    = require('method-override');
 var multer            = require('multer');
-var upload = multer({dest: 'uploads/'})
-console.log(multer);
-console.log(upload);
+var upload            = multer({dest: './routes/uploads/'})
+var cloudinary        = require('cloudinary');
+
+///////cloudinary configuration
+cloudinary.config({
+  cloud_name: "drjseeoep"
+  ,api_key: 632163526492235
+  ,api_secret: 'otIFpH0cDOvG5Rn2L2Dorpq_n4Y'
+});
 
 ///////////////////////////////////////////////////
 ///////////Our Models//////////////////////////////
@@ -48,15 +54,40 @@ module.exports = function(app){
       res.json(allPhotos);
     })
   })
+  console.log(cloudinary);
 
-  app.post('/api/newimage', upload.array('files', 1), function(req, res){
+  app.post('/api/newimage', upload.array('file', 1), function(req, res){
     console.log('yoyoyoyoyoyoy uploading an image');
     console.log(req.body);
-    console.log(req.file);
     console.log(req.files);
-    res.json('anyting?')
+    var filename = req.files[0].filename;
+    console.log(filename);
+    var destination = req.files[0].destination;
+    console.log(destination);
+    var filePath = destination + filename;
+    console.log(filePath);
+    cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+      console.log(result)
+      Photo.create({url: result.secure_url}, function(err, newPhoto){
+        console.log(newPhoto);
+        res.json(newPhoto);
+      })
+    });
   })
 
+  app.get('/api/all/photos', function(req, res){
+    Photo.find({}, function(err, photos){
+      console.log(photos);
+      res.json(photos)
+    });
+  })
+  // app.get('/api/testCloud', function(req, res){
+  //   cloudinary.uploader.upload("./routes/uploads/3d6a26a1db43670bf3fa768547e48c58", function(err, result) {
+  //     console.log(err);
+  //     console.log(result);
+  //     res.json(result);
+  //   });
+  // })
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
 
