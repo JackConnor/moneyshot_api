@@ -9,6 +9,7 @@ var photoSchema = new Schema({
   ,photosubjects: Array
   ,location: String
   ,status: String
+  ,price: Number
   ,date: Date
 })
 
