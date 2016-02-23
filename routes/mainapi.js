@@ -91,6 +91,17 @@ module.exports = function(app){
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
 
+  ///////add a price and a status of "submitted" to any photo, menaing it's accepted into the system and sent back to the user
+  app.post('/api/accepted/photo', function(req, res){
+    Photo.findOne({_id: req.body.photoId}, function(thisPhoto){
+      thisPhoto.status = "sold";
+      thisPhoto.price = req.body.price;
+      thisPhoto.save(function(updatedPhoto){
+        res.json(updatedPhoto);
+      })
+    })
+  })
+
 }
 
 mongoose.connect("mongodb://jackconnor:Skateboard1@ds011308.mongolab.com:11308/moneyshot_db");
