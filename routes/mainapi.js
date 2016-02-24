@@ -25,7 +25,6 @@ var Photo       = require('../models/photo.js');
 ///////////////////////////////////////////////////
 
 module.exports = function(app){
-  console.log('here?');
   app.get('/api/test', function(req, res){
     Photo.find({}, function(err, photos){
       // console.log(photos);
@@ -54,7 +53,6 @@ module.exports = function(app){
       res.json(allPhotos);
     })
   })
-  console.log(cloudinary);
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
     console.log('yoyoyoyoyoyoy uploading an image');
@@ -77,30 +75,44 @@ module.exports = function(app){
 
   app.get('/api/all/photos', function(req, res){
     Photo.find({}, function(err, photos){
-      console.log(photos);
       res.json(photos)
     });
   })
-  // app.get('/api/testCloud', function(req, res){
-  //   cloudinary.uploader.upload("./routes/uploads/3d6a26a1db43670bf3fa768547e48c58", function(err, result) {
-  //     console.log(err);
-  //     console.log(result);
-  //     res.json(result);
-  //   });
-  // })
-  ///////////////end photo db calls////////////////////
-  /////////////////////////////////////////////////////
+
+  app.get('/api/photo/:id', function(req, res){
+    console.log('hey there');
+    Photo.findOne({_id: req.params.id}, function(err, photo){
+      res.json(photo);
+    })
+  })
 
   ///////add a price and a status of "submitted" to any photo, menaing it's accepted into the system and sent back to the user
   app.post('/api/accepted/photo', function(req, res){
-    Photo.findOne({_id: req.body.photoId}, function(thisPhoto){
-      thisPhoto.status = "sold";
+    Photo.findOne({_id: req.body._id}, function(err, thisPhoto){
+      thisPhoto.status = req.body.status;
       thisPhoto.price = req.body.price;
-      thisPhoto.save(function(updatedPhoto){
+      thisPhoto.save(function(err, updatedPhoto){
+        console.log('__________________');
+        console.log(updatedPhoto);
         res.json(updatedPhoto);
       })
     })
   })
+
+  /////rejected photo
+  app.post('/api/reject/photo', function(req, res){
+    Photo.findOne({_id: req.body.photoId}, function(err, photo){
+      console.log(photo);
+      photo.status = 'rejected';
+      photo.save(function(err, updatedPhoto){
+        console.log(updatedPhoto);
+        res.json(updatedPhoto);
+      })
+    })
+  })
+  ///////////////end photo db calls////////////////////
+  /////////////////////////////////////////////////////
+
 
 }
 
