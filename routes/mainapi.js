@@ -80,7 +80,7 @@ module.exports = function(app){
     console.log('d');
     console.log('d');
     console.log('d');
-    console.log(req.userId);
+    console.log(req.files[0].userId);
     console.log(req.files);
     var filename = req.files[0].filename;
     console.log(filename);
