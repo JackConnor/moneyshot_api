@@ -6,6 +6,9 @@ var multer            = require('multer');
 var bcrypt            = require('bcrypt');
 var upload            = multer({dest: './routes/uploads/'})
 var cloudinary        = require('cloudinary');
+var jwt               = require('jsonwebtoken');
+console.log(jwt);
+console.log(process.env.JWT_SECRET);
 
 ///////cloudinary configuration
 cloudinary.config({
@@ -160,6 +163,16 @@ module.exports = function(app){
         }
       }
     })
+  })
+
+  /////////////function to set the json web token
+  app.post('/api/gettoken', function(req, res){
+    console.log('ooooo');
+    console.log(req.body);
+    var token = jwt.sign({userId: req.body.userId, active: true}, process.env.JWT_SECRET);
+    console.log(token);
+    console.log(jwt.verify(token, process.env.JWT_SECRET));
+    res.json(token);
   })
 
   ///////////////end Authorization calls///////////////
