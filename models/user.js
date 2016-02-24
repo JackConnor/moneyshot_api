@@ -7,6 +7,8 @@ var userSchema = new Schema({
   ,transactions: [{type: Schema.Types.ObjectId, ref: "Transaction"}]
   ,firstname: String
   ,lastname: String
+  ,email: String
+  ,passwordDigest: String
 })
 
 module.exports = mongoose.model('User', userSchema);

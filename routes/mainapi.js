@@ -114,6 +114,56 @@ module.exports = function(app){
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
 
+  /////////////////////////////////////////////////////
+  /////////////Begin Authorization calls///////////////
+
+  /////////call to signup a new user
+  app.post('/api/signup', function(req, res){
+    if(req.body.password){
+      bcrypt.hash(req.body.password, 8, function(err, newHash){
+        User.findOne({email: req.body.email}, function(err, isEmail){
+          if(isEmail == null){
+            User.create({email: req.body.email, passwordDigest: newHash}, function(err, newUser){
+              res.json(newUser)
+            })
+          }
+          else{
+            ////////error if email is already in the system
+            res.json('email already in use');
+          }
+        })
+      })
+    }
+    else {
+      //////error if they don't send a password
+      res.json('please send a password');
+    }
+  })
+
+  //////////call to sign in an existing user
+  app.post('/api/signin', function(req, res){
+    User.findOne({email: req.body.email}, function(err, user){
+      if(err){res.json(err)}
+      // console.log(user);
+      else if(user == null){
+        res.json('no user found with that email address');
+      }
+      else {
+        var unhashedPW = bcrypt.compareSync(req.body.password, user.passwordDigest);
+        console.log(unhashedPW);
+        if(unhashedPW == false){
+          res.json('incorrect password');
+        }
+        else{
+          //////////password correct
+          res.json(user)
+        }
+      }
+    })
+  })
+
+  ///////////////end Authorization calls///////////////
+  /////////////////////////////////////////////////////
 
 }
 
