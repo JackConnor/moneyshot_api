@@ -61,6 +61,7 @@ module.exports = function(app){
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
     console.log('yoyoyoyoyoyoy uploading an image');
     console.log(req.body);
+    console.log(req.userId);
     console.log(req.files);
     var filename = req.files[0].filename;
     console.log(filename);
