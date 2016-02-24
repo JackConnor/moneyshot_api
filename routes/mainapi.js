@@ -3,6 +3,7 @@ var mongoose          = require('mongoose');
 var bodyParser        = require('body-parser');
 var methodOverride    = require('method-override');
 var multer            = require('multer');
+var bcrypt            = require('bcrypt');
 var upload            = multer({dest: './routes/uploads/'})
 var cloudinary        = require('cloudinary');
 
