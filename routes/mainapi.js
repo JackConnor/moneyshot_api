@@ -76,14 +76,16 @@ module.exports = function(app){
   })
 
   app.post('/api/createphotos', function(req, res){
-    console.log(req.body);
     var url = req.body.url;
     Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
-      if(err){console.log(err)}
-      console.log(newPhoto);
-      console.log('that was num 2');
       res.json(newPhoto);
     })
+  })
+
+  app.get('/api/decodetoken/:token', function(req, res){
+    var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
+    console.log(decodedToken);
+    res.json(decodedToken);
   })
 
   app.get('/api/all/photos', function(req, res){
