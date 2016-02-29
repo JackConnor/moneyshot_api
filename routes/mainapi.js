@@ -61,26 +61,8 @@ module.exports = function(app){
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
     console.log('yoyoyoyoyoyoy uploading an image');
     console.log(req.body);
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
-    console.log('d');
     console.log(req.files);
+    // console.log(req.file)
     var filename = req.files[0].filename;
     console.log(filename);
     var destination = req.files[0].destination;
@@ -89,11 +71,16 @@ module.exports = function(app){
     console.log(filePath);
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       console.log(result)
-      Photo.create({url: result.secure_url, location: 90210, date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale"}, function(err, newPhoto){
-        console.log(newPhoto);
-        res.json(newPhoto);
-      })
+      res.json(result)
     });
+  })
+
+  app.post('/api/createphotos', function(req, res){
+    console.log(req.body);
+    Photo.create({url: req.body.url, location: 90210, date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
+      console.log(newPhoto);
+      res.json(newPhoto);
+    })
   })
 
   app.get('/api/all/photos', function(req, res){
