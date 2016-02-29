@@ -76,18 +76,9 @@ module.exports = function(app){
   })
 
   app.post('/api/createphotos', function(req, res){
-    console.log('creating photo');
-    console.log('creating photo');
-    console.log('creating photo');
-    console.log('creating photo');
-    console.log('creating photo');
-    console.log('creating photo');
-    console.log('creating photo');
-    console.log('creating photo');
-    console.log('creating photo');
     console.log(req.body);
-    var url = req.body.photoData;
-    Photo.create({url: "abcccc", location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
+    var url = req.body.url;
+    Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
       if(err){console.log(err)}
       console.log(newPhoto);
       console.log('that was num 2');
