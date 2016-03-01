@@ -89,7 +89,7 @@ module.exports = function(app){
           user.submissions.push(newSubmission.data._id)
           user.save(function(err, updatedUser){
             console.log(updatedUser);
-            res.json(updatedUser);
+            res.json(newSubmission);
           })
         })
       })
