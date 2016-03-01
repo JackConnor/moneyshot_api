@@ -78,11 +78,18 @@ module.exports = function(app){
   app.post('/api/createphotos', function(req, res){
     var url = req.body.url;
     Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
-      res.json(newPhoto);
+      User.findOne({_id:req.body.userId}, function(err, user){
+        user.photos.push(newPhoto._id);
+        user.save(function(err, updatedUser){
+          console.log(updatedUser);
+          res.json(updatedUser);
+        })
+      })
     })
   })
 
   app.get('/api/decodetoken/:token', function(req, res){
+    console.log(req.params);
     var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
     console.log(decodedToken);
     res.json(decodedToken);
@@ -98,6 +105,16 @@ module.exports = function(app){
     console.log('hey there');
     Photo.findOne({_id: req.params.id}, function(err, photo){
       res.json(photo);
+    })
+  })
+
+  //////get all photos from a single user
+  app.get('/api/userphoto/:userid', function(req, res){
+    console.log(req.params);
+    Photo.find({"creator":""}, function(err, userPhotos){
+      if(err){console.log(err)}
+      console.log(userPhotos);
+      res.json(userPhotos);
     })
   })
 
