@@ -111,10 +111,13 @@ module.exports = function(app){
   //////get all photos from a single user
   app.get('/api/userphoto/:userid', function(req, res){
     console.log(req.params);
-    Photo.find({"creator":""}, function(err, userPhotos){
-      if(err){console.log(err)}
-      console.log(userPhotos);
-      res.json(userPhotos);
+    var userId = req.params.userid;
+    console.log(userId);
+    User.findOne({_id: req.params.userid})
+    .populate('photos')
+    .exec(function(err, users){
+      console.log(users);
+      res.json(users);
     })
   })
 
