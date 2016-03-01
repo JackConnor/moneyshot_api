@@ -78,11 +78,19 @@ module.exports = function(app){
   app.post('/api/createphotos', function(req, res){
     var url = req.body.url;
     Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
-      User.findOne({_id:req.body.userId}, function(err, user){
-        user.photos.push(newPhoto._id);
-        user.save(function(err, updatedUser){
-          console.log(updatedUser);
-          res.json(updatedUser);
+      var submission = new Submission();
+      submission.photos.push(newPhoto.data._id);
+      submission.creator = req.body.userId;
+      submission.date = new Date();
+      submission.save(function(err, newSubmission){
+        console.log(newSubmission);
+        User.findOne({_id:req.body.userId}, function(err, user){
+          user.photos.push(newPhoto._id);
+          user.submissions.push(newSubmission.data._id)
+          user.save(function(err, updatedUser){
+            console.log(updatedUser);
+            res.json(updatedUser);
+          })
         })
       })
     })
