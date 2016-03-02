@@ -7,7 +7,6 @@ var bcrypt            = require('bcrypt');
 var upload            = multer({dest: './routes/uploads/'})
 var cloudinary        = require('cloudinary');
 var jwt               = require('jsonwebtoken');
-console.log(jwt);
 console.log(process.env.JWT_SECRET);
 
 ///////cloudinary configuration
@@ -24,6 +23,7 @@ var Submission  = require('../models/submission.js');
 var User        = require('../models/user.js');
 var Transaction = require('../models/transaction.js');
 var Photo       = require('../models/photo.js');
+var Video       = require('../models/video.js');
 ///////////////////////////////////////////////////
 ///////////End Models//////////////////////////////
 ///////////////////////////////////////////////////
@@ -31,7 +31,6 @@ var Photo       = require('../models/photo.js');
 module.exports = function(app){
   app.get('/api/test', function(req, res){
     Photo.find({}, function(err, photos){
-      // console.log(photos);
       res.json(photos);
     })
   })
@@ -59,18 +58,10 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
-    console.log('yoyoyoyoyoyoy uploading an image');
-    console.log(req.body);
-    console.log(req.files);
-    // console.log(req.file)
     var filename = req.files[0].filename;
-    console.log(filename);
     var destination = req.files[0].destination;
-    console.log(destination);
     var filePath = destination + filename;
-    console.log(filePath);
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-      console.log(result)
       res.json(result)
     });
   })
@@ -79,28 +70,19 @@ module.exports = function(app){
     var url = req.body.url;
     Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
       var submission = new Submission();
-      submission.photos.push(newPhoto.data._id);
+      submission.photos.push(newPhoto._id);
       submission.creator = req.body.userId;
       submission.date = new Date();
       submission.save(function(err, newSubmission){
-        console.log(newSubmission);
         User.findOne({_id:req.body.userId}, function(err, user){
           user.photos.push(newPhoto._id);
-          user.submissions.push(newSubmission.data._id)
+          user.submissions.push(newSubmission._id)
           user.save(function(err, updatedUser){
-            console.log(updatedUser);
             res.json(newSubmission);
           })
         })
       })
     })
-  })
-
-  app.get('/api/decodetoken/:token', function(req, res){
-    console.log(req.params);
-    var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
-    console.log(decodedToken);
-    res.json(decodedToken);
   })
 
   app.get('/api/all/photos', function(req, res){
@@ -110,7 +92,6 @@ module.exports = function(app){
   })
 
   app.get('/api/photo/:id', function(req, res){
-    console.log('hey there');
     Photo.findOne({_id: req.params.id}, function(err, photo){
       res.json(photo);
     })
@@ -118,14 +99,29 @@ module.exports = function(app){
 
   //////get all photos from a single user
   app.get('/api/userphoto/:userid', function(req, res){
-    console.log(req.params);
     var userId = req.params.userid;
-    console.log(userId);
     User.findOne({_id: req.params.userid})
     .populate('photos')
     .exec(function(err, users){
-      console.log(users);
       res.json(users);
+    })
+  })
+
+  //////get all submissions from a single user
+  app.get('/api/usersubmissions/:userid', function(req, res){
+    var userId = req.params.userid;
+    User.findOne({_id: req.params.userid})
+    .populate({
+      path: 'submissions',
+      model: 'Submission',
+      populate: {
+        path: 'photos',
+        model: 'Photo'
+      }
+    })
+    .populate('photos')
+    .exec(function(err, user){
+      res.json(user);
     })
   })
 
@@ -135,8 +131,6 @@ module.exports = function(app){
       thisPhoto.status = req.body.status;
       thisPhoto.price = req.body.price;
       thisPhoto.save(function(err, updatedPhoto){
-        console.log('__________________');
-        console.log(updatedPhoto);
         res.json(updatedPhoto);
       })
     })
@@ -145,14 +139,25 @@ module.exports = function(app){
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
     Photo.findOne({_id: req.body.photoId}, function(err, photo){
-      console.log(photo);
       photo.status = 'rejected';
       photo.save(function(err, updatedPhoto){
-        console.log(updatedPhoto);
         res.json(updatedPhoto);
       })
     })
   })
+
+  /////our first test post video call
+  app.post('/api/upload/video', upload.array('file', 1), function(req, res){
+    console.log('videooooo');
+    console.log(req.body);
+    console.log(req.files);
+    console.log(req.file);
+    res.json(req.body)
+  })
+
+
+
+
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
 
@@ -186,13 +191,11 @@ module.exports = function(app){
   app.post('/api/signin', function(req, res){
     User.findOne({email: req.body.email}, function(err, user){
       if(err){res.json(err)}
-      // console.log(user);
       else if(user == null){
         res.json('no user found with that email address');
       }
       else {
         var unhashedPW = bcrypt.compareSync(req.body.password, user.passwordDigest);
-        console.log(unhashedPW);
         if(unhashedPW == false){
           res.json('incorrect password');
         }
@@ -206,12 +209,14 @@ module.exports = function(app){
 
   /////////////function to set the json web token
   app.post('/api/gettoken', function(req, res){
-    console.log('ooooo');
-    console.log(req.body);
     var token = jwt.sign({userId: req.body.userId, active: true}, process.env.JWT_SECRET);
-    console.log(token);
-    console.log(jwt.verify(token, process.env.JWT_SECRET));
     res.json(token);
+  })
+
+
+  app.get('/api/decodetoken/:token', function(req, res){
+    var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
+    res.json(decodedToken);
   })
 
   ///////////////end Authorization calls///////////////
