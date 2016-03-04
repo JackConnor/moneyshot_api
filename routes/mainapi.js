@@ -7,8 +7,29 @@ var bcrypt            = require('bcrypt');
 var upload            = multer({dest: './routes/uploads/'})
 var cloudinary        = require('cloudinary');
 var jwt               = require('jsonwebtoken');
+var youtube           = require('youtube-api');
+var fs                = require('fs');
+var opn               = require('opn');
+var Lien              = require('lien');
+var resumableUpload   = require('node-youtube-resumable-upload');
+var youtubeVideo      = require('youtube-video-api');
+// console.log(youtubeVideo);
+var auth = youtube.authenticate({
+  type: "oauth"
+  ,access_token: "ya29.mgKai_ItcyWH2OC7eHRL1yIOEkIcljXDa0Y5UGKChYtfh3ynH-NSI_toNioDq78WNQ" ,refresh_token: "1/HtCXCyW9hpSF32glW_jy0gOiG9fA2Yd5c-aqIISmWLcMEudVrK5jSpoR30zcRFq6"
+  ,client_id: "852604188610-2lcdio4o8dqn8amahtmiqr79euoi43f6.apps.googleusercontent.com"
+  ,client_secret: "LqWrT_iUHQCXWa5ENS4GZ0og"
+  ,redirect_url: "http://localhost:5555"
+  });
+
 console.log(process.env.JWT_SECRET);
 
+var server = new Lien({
+    host: "localhost"
+    ,port: 5555
+    ,root: __dirname + "/public"
+});
+// console.log(server);
 ///////cloudinary configuration
 cloudinary.config({
   cloud_name: "drjseeoep"
@@ -58,6 +79,7 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
+    console.log(req.files);
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
     var filePath = destination + filename;
@@ -67,19 +89,15 @@ module.exports = function(app){
   })
 
   app.post('/api/createphotos', function(req, res){
+    console.log(req.body);
     var url = req.body.url;
-    Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", creator: req.body.userId}, function(err, newPhoto){
-      var submission = new Submission();
-      submission.photos.push(newPhoto._id);
-      submission.creator = req.body.userId;
-      submission.date = new Date();
-      submission.save(function(err, newSubmission){
-        User.findOne({_id:req.body.userId}, function(err, user){
-          user.photos.push(newPhoto._id);
-          user.submissions.push(newSubmission._id)
-          user.save(function(err, updatedUser){
-            res.json(newSubmission);
-          })
+    Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
+      console.log('new photo object');
+      console.log(newPhoto);
+      User.findOne({_id:req.body.userId}, function(err, user){
+        user.photos.push(newPhoto._id);
+        user.save(function(err, updatedUser){
+          res.json(newPhoto);
         })
       })
     })
@@ -148,18 +166,52 @@ module.exports = function(app){
 
   /////our first test post video call
   app.post('/api/upload/video', upload.array('file', 1), function(req, res){
-    console.log('videooooo');
-    console.log(req.body);
-    console.log(req.files);
-    console.log(req.file);
-    res.json(req.body)
+    var filename = req.files[0].filename;
+    var destination = req.files[0].destination;
+    var filePath = destination + filename;
+    cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+      console.log('results results results');
+      res.json(result.url)
+    }, { resource_type: "video" });
   })
-
-
-
 
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
+
+
+  //////submission calls
+  //////////////////////
+
+  app.post('/api/new/submission', function(req, res){
+    console.log(req.body);
+    var submission = new Submission();
+    console.log(submission);
+    submission.creator = req.body.userId;
+    submission.photos[0] = req.body.photos[0];
+    for (var i = 0; i < req.body.photos.length; i++) {
+      submission.photos[i] = req.body.photos[i];
+    }
+    for (var i = 0; i < req.body.videos.length; i++) {
+      submission.videos[i] = req.body.videos[i];
+    }
+    // submission.videos = req.body.videos;
+    submission.save(function(err, newSub){
+      if(err){console.log(err)}
+      console.log(newSub);
+      User.findOne({'_id': req.body.userId}, function(err, user){
+        console.log(user);
+        user.submissions.push(newSub._id)
+        user.save(function(updatedUser){
+
+          res.json(updatedUser)
+        })
+      })
+    })
+  })
+
+  //////end submission calls
+  //////////////////////////
+
 
   /////////////////////////////////////////////////////
   /////////////Begin Authorization calls///////////////
@@ -223,5 +275,11 @@ module.exports = function(app){
   /////////////////////////////////////////////////////
 
 }
+
+// Listen for load
+server.on("load", function (err) {
+    console.log(err || "Server started on port 5555.");
+    err && process.exit(1);
+});
 
 mongoose.connect("mongodb://jackconnor:Skateboard1@ds011308.mongolab.com:11308/moneyshot_db");
