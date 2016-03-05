@@ -134,7 +134,7 @@ module.exports = function(app){
       model: 'Submission',
       populate: {
         path: 'photos',
-        model: 'Photo'
+        model: 'Photo',
       }
     })
     .populate('photos')
@@ -171,7 +171,13 @@ module.exports = function(app){
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       console.log('results results results');
-      res.json(result.url)
+      console.log('results results results');
+      console.log('results results results');
+      console.log('results results results');
+      console.log('results results results');
+      console.log(result);
+      console.log('results results results');
+      res.json(result.secure_url)
     }, { resource_type: "video" });
   })
 
@@ -192,7 +198,7 @@ module.exports = function(app){
       submission.photos[i] = req.body.photos[i];
     }
     for (var i = 0; i < req.body.videos.length; i++) {
-      submission.videos[i] = req.body.videos[i];
+      submission.photos.push(req.body.videos[i]);
     }
     // submission.videos = req.body.videos;
     submission.save(function(err, newSub){
@@ -202,7 +208,7 @@ module.exports = function(app){
         console.log(user);
         user.submissions.push(newSub._id)
         user.save(function(updatedUser){
-
+          console.log(updatedUser);
           res.json(updatedUser)
         })
       })
