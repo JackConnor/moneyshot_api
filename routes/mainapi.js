@@ -84,7 +84,7 @@ module.exports = function(app){
     var destination = req.files[0].destination;
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-      res.json(result)
+      res.json(result);
     });
   })
 
