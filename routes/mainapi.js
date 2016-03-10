@@ -79,21 +79,27 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
+    console.log('making new image');
+    console.log('body');
+    console.log(req.body);
+    console.log('params');
+    console.log(req.params);
+    console.log('files');
     console.log(req.files);
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       res.json(result);
-    });
+    }, {width: parseInt(req.body.cloudCropImageWidth), height: parseInt(req.body.cloudCropImageHeight), x: parseInt(req.body.cloudCropImageX), y: parseInt(req.body.cloudCropImageY), crop: 'crop'});
   })
 
   app.post('/api/createphotos', function(req, res){
-    console.log(req.body);
+    // console.log(req.body);
     var url = req.body.url;
     Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
       console.log('new photo object');
-      console.log(newPhoto);
+      // console.log(newPhoto);
       User.findOne({_id:req.body.userId}, function(err, user){
         user.photos.push(newPhoto._id);
         user.save(function(err, updatedUser){
@@ -170,13 +176,6 @@ module.exports = function(app){
     var destination = req.files[0].destination;
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-      console.log('results results results');
-      console.log('results results results');
-      console.log('results results results');
-      console.log('results results results');
-      console.log('results results results');
-      console.log(result);
-      console.log('results results results');
       res.json(result.secure_url)
     }, { resource_type: "video" });
   })
@@ -189,9 +188,7 @@ module.exports = function(app){
   //////////////////////
 
   app.post('/api/new/submission', function(req, res){
-    console.log(req.body);
     var submission = new Submission();
-    console.log(submission);
     submission.creator = req.body.userId;
     submission.photos[0] = req.body.photos[0];
     for (var i = 0; i < req.body.photos.length; i++) {
@@ -203,12 +200,9 @@ module.exports = function(app){
     // submission.videos = req.body.videos;
     submission.save(function(err, newSub){
       if(err){console.log(err)}
-      console.log(newSub);
       User.findOne({'_id': req.body.userId}, function(err, user){
-        console.log(user);
         user.submissions.push(newSub._id)
         user.save(function(updatedUser){
-          console.log(updatedUser);
           res.json(updatedUser)
         })
       })
@@ -273,6 +267,7 @@ module.exports = function(app){
 
 
   app.get('/api/decodetoken/:token', function(req, res){
+    console.log('yo decoding');
     var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
     res.json(decodedToken);
   })
