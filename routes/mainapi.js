@@ -79,19 +79,51 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
-    console.log('making new image');
     console.log('body');
     console.log(req.body);
-    console.log('params');
-    console.log(req.params);
-    console.log('files');
-    console.log(req.files);
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
     var filePath = destination + filename;
+    var width = function(){
+      if(req.body.cloudCropImageWidth){
+        return req.body.cloudCropImageWidth;
+      }
+      else {
+        return req.body.naturalWidth;
+      }
+    }
+    console.log(width());
+    var height = function(){
+      if(req.body.cloudCropImageHeight){
+        return req.body.cloudCropImageHeight;
+      }
+      else {
+        return req.body.naturalHeight;
+      }
+    }
+    var offsetX = function(){
+      if(req.body.cloudCropImageX){
+        return req.body.cloudCropImageX;
+      }
+      else {
+        return 0;
+      }
+    }
+    var offsetY = function(){
+      if(req.body.cloudCropImageY){
+        return req.body.cloudCropImageY;
+      }
+      else {
+        return 0;
+      }
+    }
+    console.log(height());
+    console.log(width());
+    console.log(offsetY());
+    console.log(offsetX());
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       res.json(result);
-    }, {width: parseInt(req.body.cloudCropImageWidth), height: parseInt(req.body.cloudCropImageHeight), x: parseInt(req.body.cloudCropImageX), y: parseInt(req.body.cloudCropImageY), crop: 'crop'});
+    }, {width: width(), height: height(), x: offsetX(), y:  offsetY(), crop: 'crop'});
   })
 
   app.post('/api/createphotos', function(req, res){
