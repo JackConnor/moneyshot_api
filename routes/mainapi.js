@@ -303,9 +303,17 @@ module.exports = function(app){
     var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
     res.json(decodedToken);
   })
-
   ///////////////end Authorization calls///////////////
   /////////////////////////////////////////////////////
+
+  /////get all user info
+  app.post('/api/userinfo', function(req, res){
+    console.log(req.body);
+    User.findOne({"_id": req.body.userId}, function(err, userInfo){
+      console.log(userInfo);
+      res.json(userInfo);
+    })
+  })
 
 }
 
