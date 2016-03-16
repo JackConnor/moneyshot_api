@@ -318,7 +318,7 @@ module.exports = function(app){
 
   /////////////////////
   ////bank calls//////
-  app.get('/api/banking/:stripe_data', function(req, res){
+  app.get('/:stripe_data', function(req, res){
     console.log(req.params);
     res.json(req.params)
   })
