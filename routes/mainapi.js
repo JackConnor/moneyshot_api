@@ -11,16 +11,10 @@ var youtube           = require('youtube-api');
 var fs                = require('fs');
 var opn               = require('opn');
 var Lien              = require('lien');
+var request           = require('request');
 var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
-// console.log(youtubeVideo);
-var auth = youtube.authenticate({
-  type: "oauth"
-  ,access_token: "ya29.mgKai_ItcyWH2OC7eHRL1yIOEkIcljXDa0Y5UGKChYtfh3ynH-NSI_toNioDq78WNQ" ,refresh_token: "1/HtCXCyW9hpSF32glW_jy0gOiG9fA2Yd5c-aqIISmWLcMEudVrK5jSpoR30zcRFq6"
-  ,client_id: "852604188610-2lcdio4o8dqn8amahtmiqr79euoi43f6.apps.googleusercontent.com"
-  ,client_secret: "LqWrT_iUHQCXWa5ENS4GZ0og"
-  ,redirect_url: "http://localhost:5555"
-  });
+var stripe            = require('stripe')('sk_live_27uz4sTWsGtE5gkVhrRgcL5R');
 
 console.log(process.env.JWT_SECRET);
 
@@ -299,7 +293,6 @@ module.exports = function(app){
 
 
   app.get('/api/decodetoken/:token', function(req, res){
-    console.log('yo decoding');
     var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
     res.json(decodedToken);
   })
@@ -308,9 +301,7 @@ module.exports = function(app){
 
   /////get all user info
   app.post('/api/userinfo', function(req, res){
-    console.log(req.body);
     User.findOne({"_id": req.body.userId}, function(err, userInfo){
-      console.log(userInfo);
       res.json(userInfo);
     })
   })
@@ -318,9 +309,40 @@ module.exports = function(app){
 
   /////////////////////
   ////bank calls//////
-  app.get('/:stripe_data', function(req, res){
+  app.get('banking/:stripe_data', function(req, res){
+    console.log('stripe params');
     console.log(req.params);
     res.json(req.params)
+  })
+
+  app.get('/api/stripe/test', function(req, res){
+    console.log(1);
+    console.log(req.query);
+    console.log('yoyoyoyo');
+    var token = req.query.code;
+    console.log(token);
+    // res.json(token);
+    request.post({
+      url: 'https://connect.stripe.com/oauth/token',
+      form: {
+        grant_type: "authorization_code",
+        client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F",
+        code: token,
+        client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
+      }
+    }, function(err, r, body) {
+      // if(err){console.log(err)}
+      // if(r){console.log(r)}
+      console.log(body);
+
+      var accessToken = JSON.parse(body).access_token;
+
+      // Do something with your accessToken
+
+      // For demo"s sake, output in response:
+      // res.send({ "Your Token": accessToken });
+
+    });
   })
 
   ////bank calls//////
