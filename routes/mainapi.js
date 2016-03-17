@@ -180,6 +180,7 @@ module.exports = function(app){
     Photo.findOne({_id: req.body._id}, function(err, thisPhoto){
       thisPhoto.status = req.body.status;
       thisPhoto.price = req.body.price;
+      thisPhoto.status = "price offered";
       thisPhoto.save(function(err, updatedPhoto){
         res.json(updatedPhoto);
       })
@@ -347,6 +348,10 @@ module.exports = function(app){
         user.stripe_publishable_key = JSON.parse(userData).stripe_publishable_key;
         user.save(function(err, newUser){
           console.log(newUser);
+          ////////some shit to test creating a charge
+          stripe.charges.create({
+            source: newUser.stripe_publishable_key
+          }, {stripe_account: newUser.stripe_user_id})
           // res.json(newUser);
           res.redirect("/")
         })

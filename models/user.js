@@ -10,6 +10,7 @@ var userSchema = new Schema({
   ,stripe_publishable_key: String
   ,stripe_user_id: String
   ,bankaccounts: Array
+  ,status: String
   ,firstname: String
   ,lastname: String
   ,email: String
