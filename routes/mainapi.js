@@ -351,30 +351,22 @@ module.exports = function(app){
           res.redirect("/")
         })
       })
-
-      ////////addd stuff to database here
-
-      /////////end db stuff///////
-
     })
-    // request.post({
-    //   url: 'https://connect.stripe.com/oauth/token',
-    //   form: {
-    //     grant_type: "refresh_token",
-    //     client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F",
-    //     refresh_token: "rt_85wNhyIGYVEAdZiDK0XckySGPcFpKAD5IAZLopFjzLi5kMTx",
-    //     client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
-    //   }
-    // }, function(err, r, body) {
-    //   // if(err){console.log(err)}
-    //   // if(r){console.log(r)}
-    //   console.log(body);
-    //   res.json(body);
-    //
-    //   var accessToken = JSON.parse(body).access_token;
-    // });
   })
 
+  ///delete a bank account
+  app.post('/api/delete/bank', function(req, res){
+    User.findOne({"_id":req.body.userId}, function(err, user){
+      console.log(user);
+      user.access_token = '';
+      user.refresh_token = '';
+      user.stripe_user_id = '';
+      user.stripe_publishable_key = '';
+      user.save(function(err, newUser){
+        res.json(newUser);
+      })
+    })
+  })
   ////bank calls//////
   /////////////////////
 }
