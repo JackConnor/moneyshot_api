@@ -180,7 +180,6 @@ module.exports = function(app){
     Photo.findOne({_id: req.body._id}, function(err, thisPhoto){
       thisPhoto.status = req.body.status;
       thisPhoto.price = req.body.price;
-      thisPhoto.status = "price offered";
       thisPhoto.save(function(err, updatedPhoto){
         res.json(updatedPhoto);
       })
