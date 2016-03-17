@@ -14,7 +14,7 @@ var Lien              = require('lien');
 var request           = require('request');
 var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
-var stripe            = require('stripe')('sk_live_27uz4sTWsGtE5gkVhrRgcL5R');
+var stripe            = require('stripe')('sk_test_InGTWI3kMvNLl9HNs7eGUi8X');
 
 console.log(process.env.JWT_SECRET);
 
@@ -248,7 +248,9 @@ module.exports = function(app){
       bcrypt.hash(req.body.password, 8, function(err, newHash){
         User.findOne({email: req.body.email}, function(err, isEmail){
           if(isEmail == null){
-            User.create({email: req.body.email, passwordDigest: newHash}, function(err, newUser){
+            User.create({email: req.body.email, passwordDigest: newHash, access_token: '', refresh_token: '', stripe_publishable_key: '', stripe_user_id: ''}, function(err, newUser){
+              console.log('new user');
+              console.log(newUser);
               res.json(newUser)
             })
           }
@@ -309,40 +311,68 @@ module.exports = function(app){
 
   /////////////////////
   ////bank calls//////
-  app.get('banking/:stripe_data', function(req, res){
-    console.log('stripe params');
-    console.log(req.params);
-    res.json(req.params)
-  })
+  // app.get('banking/:stripe_data', function(req, res){
+  //   console.log('stripe params');
+  //   console.log(req.params);
+  //   res.json(req.params)
+  // })
 
-  app.get('/api/stripe/test', function(req, res){
+  app.get('/api/stripe/test/', function(req, res){
     console.log(1);
+    // var token = req.body.token;
     console.log(req.query);
     console.log('yoyoyoyo');
     var token = req.query.code;
     console.log(token);
     // res.json(token);
     request.post({
-      url: 'https://connect.stripe.com/oauth/token',
-      form: {
-        grant_type: "authorization_code",
-        client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F",
-        code: token,
-        client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
+      url: 'https://connect.stripe.com/oauth/token'
+      ,form: {
+        grant_type: "authorization_code"
+        ,code: token
+        ,client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
+        ,client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F"
       }
-    }, function(err, r, body) {
-      // if(err){console.log(err)}
-      // if(r){console.log(r)}
-      console.log(body);
+    }, function(err, r, userData){
+      if(err){console.log(err)}
+      console.log('in the callback');
+      console.log(req.query.state);
+      console.log(userData);
+      User.findOne({'_id':req.query.state}, function(err, user){
+        console.log('user coming');
+        console.log(user);
+        user.access_token = JSON.parse(userData).access_token;
+        user.refresh_token = JSON.parse(userData).refresh_token;
+        user.stripe_user_id = JSON.parse(userData).stripe_user_id;
+        user.stripe_publishable_key = JSON.parse(userData).stripe_publishable_key;
+        user.save(function(err, newUser){
+          console.log(newUser);
+          // res.json(newUser);
+          res.redirect("/")
+        })
+      })
 
-      var accessToken = JSON.parse(body).access_token;
+      ////////addd stuff to database here
 
-      // Do something with your accessToken
+      /////////end db stuff///////
 
-      // For demo"s sake, output in response:
-      // res.send({ "Your Token": accessToken });
-
-    });
+    })
+    // request.post({
+    //   url: 'https://connect.stripe.com/oauth/token',
+    //   form: {
+    //     grant_type: "refresh_token",
+    //     client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F",
+    //     refresh_token: "rt_85wNhyIGYVEAdZiDK0XckySGPcFpKAD5IAZLopFjzLi5kMTx",
+    //     client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
+    //   }
+    // }, function(err, r, body) {
+    //   // if(err){console.log(err)}
+    //   // if(r){console.log(r)}
+    //   console.log(body);
+    //   res.json(body);
+    //
+    //   var accessToken = JSON.parse(body).access_token;
+    // });
   })
 
   ////bank calls//////

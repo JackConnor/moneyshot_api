@@ -5,23 +5,33 @@
 <a href="mopho://">Open my app</a>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js" charset="utf-8"></script>
 <script type="text/javascript">
-  console.log('wuuuuut');
-  var para = window.location.toString().split('code=')[1];
-  console.log(para);
+  // console.log('wuuuuut');
+  // var para = window.location.toString().split('code=')[1];
+  // console.log(para);
+  window.location.href="mopho://";
 
-  alert(para);
+  // alert(para);
   // var code = window.location.split('code=')[1];
   // console.log(code);
   // console.log(window.location);
-  // window.location.href="mopho://var/mobile/Containers/Bundle/Application/901D6AE7-85B0-4C54-8885-8503CD8D676E/moneyshot_ionic_app.app/www/index.html#/tab/account";
 
   ////////ajax requests
+  // alert(window.localStorage.userInfo);
+  // alert(window.localStorage.webToken);
+  console.log(window.localStorage);
   $.ajax({
-    method: "POST"
+    type: "POST"
     ,url: "http://192.168.0.8:5555/api/stripe/test"
     ,data: {'token':para}
     ,success: function(data){
       console.log(data);
+      alert(data)
+      // alert(window.localStorage.userInfo)
+
+      // console.log(data);
+      // window.localStorage.stripeStuff = data;
+      // console.log(window.localStorage);
+
     }
   })
 </script>
