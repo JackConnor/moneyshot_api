@@ -373,6 +373,23 @@ module.exports = function(app){
   })
   ////bank calls//////
   /////////////////////
+
+  ////////function to submit or reject a photo
+  app.post('/api/photopurchase', function(req, res){
+    var photoId = req.body.photoId;
+    Photo.findOne({'_id': photoId}, function(err, photo){
+      if(req.body.status == 'sold'){
+        photo.status = 'sold';
+      }
+      else if(req.body.status == 'rejected'){
+        photo.status = 'rejected'
+      }
+      photo.save(function(err, updatedPhoto){
+        console.log(updatedPhoto);
+        res.json(updatedPhoto);
+      })
+    })
+  })
 }
 
 // Listen for load
