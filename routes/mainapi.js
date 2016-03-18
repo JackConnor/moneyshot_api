@@ -378,21 +378,18 @@ module.exports = function(app){
     //   { description: "example@stripe.com" },
     //   {stripe_account: req.body.access_token} // account's access token from the Connect flow
     // );
-    request.post({
-      url: 'https://connect.stripe.com/oauth/token'
-      ,form: {
-        grant_type: "refresh_token"
-        ,refresh_token: req.body.refresh_token
-        ,client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
-        ,client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F"
-      }
-    }, function(err, r, userData){
-      console.log(userData);
-      stripe.customers.create(
-        {description: "example@stripe.com"},
-        {stripe_account: userData.access_token})
-        .then(function(newCust){
-          console.log(newCust);
+    Photo.findOne({'_id': photoId}, function(err, photo){
+      if(req.body.status == 'sold'){
+        request.post({
+          url: 'https://connect.stripe.com/oauth/token'
+          ,form: {
+            grant_type: "refresh_token"
+            ,refresh_token: req.body.refresh_token
+            ,client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
+            ,client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F"
+          }
+        }, function(err, r, userData){
+          console.log(userData);
           stripe.tokens.create({
             card: {
               "number": '4242424242424242',
@@ -404,51 +401,29 @@ module.exports = function(app){
             // asynchronously called
             console.log(token);
             stripe.charges.create({
-              amount: 1000,
+              amount: req.body.price,
               currency: 'usd',
               source: token.id
             }, {stripe_account: userData.stripe_user_id})
             .then(function(newCharge){
               console.log('charginggggg');
               console.log(newCharge);
+              photo.status = 'sold';
+              photo.save(function(err, updatedPhoto){
+                console.log(updatedPhoto);
+                res.json(newCharge);
+              });
             })
           });
-      });
-    })
-    // stripe.customers.create(
-    //   {description: "example@stripe.com"},
-    //   {stripe_account: req.body.access_token}, function(err, newCust){
-    //     console.log('callback');
-    //     console.log(newCust);
-    //     stripe.charges.create({
-    //       amount: 1000,
-    //       currency: 'usd',
-    //       source: newCust.stripe_publishable_key
-    //     },
-    //     {stripe_account: newCust.stripe_user_id},
-    //     function(newCharge){
-    //       console.log(newCharge);
-    //     }
-    //   )
-    // });
-    // stripe.customers.retrieve({stripe_account: req.body.access_token})
-    // pk_test_EnvGyRiplYEdOaQMT4CBRlSd
-    // stripe.charges.create({
-    //   amount: 1000,
-    //   currency: 'usd',
-    //   source: "pk_test_EnvGyRiplYEdOaQMT4CBRlSd"
-    // }, {stripe_account: req.body.access_token});
-    Photo.findOne({'_id': photoId}, function(err, photo){
-      if(req.body.status == 'sold'){
-        photo.status = 'sold';
+        })
       }
       else if(req.body.status == 'rejected'){
-        photo.status = 'rejected'
+        photo.status = 'rejected';
+        photo.save(function(err, updatedPhoto){
+          console.log(updatedPhoto);
+          res.json(updatedPhoto);
+        });
       }
-      photo.save(function(err, updatedPhoto){
-        console.log(updatedPhoto);
-        res.json(updatedPhoto);
-      })
     })
   })
 }
