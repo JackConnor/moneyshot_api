@@ -467,7 +467,8 @@ module.exports = function(app){
 
   app.post('/api/getpw', function(req, res){
     console.log(req.body);
-    User.findOne({"email": 'Jack.connor83@gmail.com'}, function(err, user){
+    var userEmail = req.body.userEmail.toLowerCase();
+    User.findOne({"email": userEmail}, function(err, user){
       if(err){console.log(err)}
       console.log(user);
       res.json(user);
