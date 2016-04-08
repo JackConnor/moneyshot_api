@@ -257,11 +257,13 @@ module.exports = function(app){
 
   /////////call to signup a new user
   app.post('/api/signup', function(req, res){
+    var emailLower = req.body.email.toLowerCase();
+    console.log(emailLower);
     if(req.body.password){
       bcrypt.hash(req.body.password, 8, function(err, newHash){
-        User.findOne({email: req.body.email}, function(err, isEmail){
+        User.findOne({email: emailLower}, function(err, isEmail){
           if(isEmail == null){
-            User.create({email: req.body.email, passwordDigest: newHash, access_token: '', refresh_token: '', stripe_publishable_key: '', stripe_user_id: ''}, function(err, newUser){
+            User.create({email: emailLower, passwordDigest: newHash, access_token: '', refresh_token: '', stripe_publishable_key: '', stripe_user_id: ''}, function(err, newUser){
               console.log('new user');
               console.log(newUser);
               res.json(newUser)
@@ -444,10 +446,11 @@ module.exports = function(app){
   ////////////email functions///////
   app.post('/api/signup/email', function(req, res){
     //////nodemailer stuff
+    console.log(req.body);
     var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
     var mailOptions = {
         from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
-        to: 'jack.connor83@gmail.com', // list of receivers
+        to: req.body.userEmail, // list of receivers
         subject: 'New Mopho Account ✔', // Subject line
         text: 'Thank you for signing up', // plaintext body
         html: '<b>Thank you for signing up! Here is a horse 🐴</b>' // html body
@@ -458,8 +461,19 @@ module.exports = function(app){
             return console.log(error);
         }
         console.log('Message sent: ' + info.response);
+        res.json(info)
     });
   })
+
+  app.post('/api/getpw', function(req, res){
+    console.log(req.body);
+    User.findOne({"email": 'Jack.connor83@gmail.com'}, function(err, user){
+      if(err){console.log(err)}
+      console.log(user);
+      res.json(user);
+    })
+  })
+
   ////////////email functions///////
   //////////////////////////////////
 
