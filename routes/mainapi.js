@@ -15,6 +15,7 @@ var request           = require('request');
 var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
 var stripe            = require('stripe')('sk_test_InGTWI3kMvNLl9HNs7eGUi8X');
+var nodemailer        = require('nodemailer');
 
 console.log(process.env.JWT_SECRET);
 
@@ -86,18 +87,17 @@ module.exports = function(app){
         return req.body.naturalWidth;
       }
     }
-    console.log(width());
     var height = function(){
       if(req.body.cloudCropImageHeight){
-        return req.body.cloudCropImageHeight;
+        return parseInt(req.body.cloudCropImageHeight);
       }
       else {
-        return req.body.naturalHeight;
+        return parseInt(req.body.naturalHeight);
       }
     }
     var offsetX = function(){
       if(req.body.cloudCropImageX){
-        return req.body.cloudCropImageX;
+        return parseInt(req.body.cloudCropImageX);
       }
       else {
         return 0;
@@ -105,19 +105,32 @@ module.exports = function(app){
     }
     var offsetY = function(){
       if(req.body.cloudCropImageY){
-        return req.body.cloudCropImageY;
+        return parseInt(req.body.cloudCropImageY);
       }
       else {
         return 0;
       }
     }
+    console.log('coords');
     console.log(height());
     console.log(width());
     console.log(offsetY());
     console.log(offsetX());
-    cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+    cloudinary.uploader.upload("./routes/uploads/"+filename, {width: 300, height: 300}, function(result) {
       res.json(result);
-    }, {width: width(), height: height(), x: offsetX(), y:  offsetY(), crop: 'crop'});
+    });
+  })
+
+  ///////function to convert a photo for cropping
+
+  app.post('/crop/photo', upload.array('file', 1), function(req, res){
+    var filename = req.files[0].filename;
+    var destination = req.files[0].destination;
+    var filePath = destination + filename;
+    cloudinary.uploader.upload("./routes/uploads/"+filename, function(result){
+      console.log(result);
+      res.json(result);
+    })
   })
 
   app.post('/api/createphotos', function(req, res){
@@ -426,7 +439,34 @@ module.exports = function(app){
       }
     })
   })
+
+  //////////////////////////////////
+  ////////////email functions///////
+  app.post('/api/signup/email', function(req, res){
+    //////nodemailer stuff
+    var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
+    var mailOptions = {
+        from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
+        to: 'jack.connor83@gmail.com', // list of receivers
+        subject: 'New Mopho Account ✔', // Subject line
+        text: 'Thank you for signing up', // plaintext body
+        html: '<b>Thank you for signing up! Here is a horse 🐴</b>' // html body
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+    });
+  })
+  ////////////email functions///////
+  //////////////////////////////////
+
 }
+
+
+
 
 // Listen for load
 server.on("load", function (err) {
