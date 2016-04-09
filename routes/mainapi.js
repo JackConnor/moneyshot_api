@@ -471,7 +471,34 @@ module.exports = function(app){
     User.findOne({"email": userEmail}, function(err, user){
       if(err){console.log(err)}
       console.log(user);
-      res.json(user);
+      if(user == null){
+        res.json({bool: false, message: 'no user'});
+      }
+      else{
+        res.json({bool: true, message: 'successful lookup'});
+      }
+    })
+  })
+
+  app.post('/api/update/pw', function(req, res){
+    console.log(req.body);
+    var email = req.body.email.toLowerCase();
+    User.findOne({email: email}, function(err, user){
+      console.log(user);
+      var newHash = bcrypt.hashSync(req.body.password, 8);
+      console.log(newHash);
+      user.passwordDigest = newHash;
+      var isTrue = bcrypt.compareSync(req.body.password, newHash);
+      console.log(isTrue);
+      user.save(function(err, newUser){
+        if(err) throw err;
+        console.log(newUser);
+        // bcrypt.compare(req.body.password, function(err, result) {
+        //     console.log('new password?');
+        //     console.log(result);
+        //     res.json(newUser);
+        // });
+      })
     })
   })
 
