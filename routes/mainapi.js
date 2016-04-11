@@ -505,29 +505,34 @@ module.exports = function(app){
     console.log(email);
 
     User.findOne({'email': email}, function(err, user){
-      if(err) throw err;
-      console.log(user);
-      var userId = user._id;
-      // console.log(userId);
-      //
-      // var hashId = bcrypt.hashSync(userId.toString(), 8);
-      // console.log(hashId);
-      var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
-      var mailOptions = {
-          from: '"New Password" <jack.connor83@gmail.com>', // sender address
-          to: 'jack.connor83@gmail.com', // list of receivers
-          subject: 'update password', // Subject line
-          text: 'Thank you for signing up', // plaintext body
-          html: '<b>click the following link to get your new password: localhost:5000/#/new/password/'+userId+'</b>' // html body
-      };
+      if(err) res.json(err);
+      if(user !== null){
+        console.log(user);
+        var userId = user._id;
+        // console.log(userId);
+        //
+        // var hashId = bcrypt.hashSync(userId.toString(), 8);
+        // console.log(hashId);
+        var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
+        var mailOptions = {
+            from: '"New Password" <jack.connor83@gmail.com>', // sender address
+            to: 'jack.connor83@gmail.com', // list of receivers
+            subject: 'update password', // Subject line
+            text: 'Thank you for signing up', // plaintext body
+            html: '<b>click the following link to get your new password: http://192.168.0.7:5000//#/new/password/'+userId+'</b>' // html body
+        };
 
-      transporter.sendMail(mailOptions, function(error, info){
-          if(error){
-              return console.log(error);
-          }
-          console.log('Message sent: ' + info.response);
-          res.json(info)
-      });
+        transporter.sendMail(mailOptions, function(error, info){
+            if(error){
+                return console.log(error);
+            }
+            console.log('Message sent: ' + info.response);
+            res.json(info)
+        });
+      }
+      else {
+        res.json('no user');
+      }
     })
   })
   ////////////email functions///////
