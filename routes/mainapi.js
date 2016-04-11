@@ -74,8 +74,9 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
-    console.log('body');
-    console.log(req.body);
+    // console.log('body');
+    // console.log(req.body);
+    console.log(req.files);
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
     var filePath = destination + filename;
@@ -116,7 +117,7 @@ module.exports = function(app){
     console.log(width());
     console.log(offsetY());
     console.log(offsetX());
-    cloudinary.uploader.upload("./routes/uploads/"+filename, {width: 300, height: 300}, function(result) {
+    cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       res.json(result);
     });
   })
@@ -482,8 +483,8 @@ module.exports = function(app){
 
   app.post('/api/update/pw', function(req, res){
     console.log(req.body);
-    var email = req.body.email.toLowerCase();
-    User.findOne({email: email}, function(err, user){
+    User.findOne({_id: req.body._id}, function(err, user){
+      if(err){console.log(err)}
       console.log(user);
       var newHash = bcrypt.hashSync(req.body.password, 8);
       console.log(newHash);
@@ -491,17 +492,44 @@ module.exports = function(app){
       var isTrue = bcrypt.compareSync(req.body.password, newHash);
       console.log(isTrue);
       user.save(function(err, newUser){
-        if(err) throw err;
+        if(err){res.json(err)}
+        console.log('newUser');
         console.log(newUser);
-        // bcrypt.compare(req.body.password, function(err, result) {
-        //     console.log('new password?');
-        //     console.log(result);
-        //     res.json(newUser);
-        // });
+        res.json(newUser)
       })
     })
   })
 
+  app.post('/api/newpw/request', function(req, res){
+    var email = req.body.userEmail;
+    console.log(email);
+
+    User.findOne({'email': email}, function(err, user){
+      if(err) throw err;
+      console.log(user);
+      var userId = user._id;
+      // console.log(userId);
+      //
+      // var hashId = bcrypt.hashSync(userId.toString(), 8);
+      // console.log(hashId);
+      var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
+      var mailOptions = {
+          from: '"New Password" <jack.connor83@gmail.com>', // sender address
+          to: 'jack.connor83@gmail.com', // list of receivers
+          subject: 'update password', // Subject line
+          text: 'Thank you for signing up', // plaintext body
+          html: '<b>click the following link to get your new password: localhost:5000/#/new/password/'+userId+'</b>' // html body
+      };
+
+      transporter.sendMail(mailOptions, function(error, info){
+          if(error){
+              return console.log(error);
+          }
+          console.log('Message sent: ' + info.response);
+          res.json(info)
+      });
+    })
+  })
   ////////////email functions///////
   //////////////////////////////////
 
