@@ -11,6 +11,7 @@ var youtube           = require('youtube-api');
 var fs                = require('fs');
 var opn               = require('opn');
 var Lien              = require('lien');
+var dotenv            = require('dotenv');
 var request           = require('request');
 var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
@@ -18,6 +19,7 @@ var stripe            = require('stripe')('sk_test_InGTWI3kMvNLl9HNs7eGUi8X');
 var nodemailer        = require('nodemailer');
 
 console.log(process.env.JWT_SECRET);
+// console.log(process.env.STRIPE_ID);
 
 var server = new Lien({
     host: "localhost"
@@ -534,6 +536,11 @@ module.exports = function(app){
         res.json('no user');
       }
     })
+  })
+
+
+  app.get('/api/bankroute', function(req, res){
+    res.json()
   })
   ////////////email functions///////
   //////////////////////////////////
