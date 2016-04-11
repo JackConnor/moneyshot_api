@@ -15,7 +15,7 @@ var dotenv            = require('dotenv').config();
 var request           = require('request');
 var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
-var stripe            = require('stripe')('sk_test_InGTWI3kMvNLl9HNs7eGUi8X');
+var stripe            = require('stripe')(process.env.STRIPE_TEST_ID);
 var nodemailer        = require('nodemailer');
 
 console.log(process.env.JWT_SECRET);
@@ -540,7 +540,8 @@ module.exports = function(app){
 
 
   app.get('/api/bankroute', function(req, res){
-    res.json()
+    console.log('yo');
+    res.json(process.env.STRIPE_ID)
   })
   ////////////email functions///////
   //////////////////////////////////
