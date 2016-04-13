@@ -411,42 +411,49 @@ module.exports = function(app){
     // );
     Photo.findOne({'_id': photoId}, function(err, photo){
       if(req.body.status == 'sold'){
-        request.post({
-          url: 'https://connect.stripe.com/oauth/token'
-          ,form: {
-            grant_type: "refresh_token"
-            ,refresh_token: req.body.refresh_token
-            ,client_secret: "sk_test_InGTWI3kMvNLl9HNs7eGUi8X"
-            ,client_id: "ca_85XIIrajUKuhChdWZQFJ9zu1lmuzul3F"
-          }
-        }, function(err, r, userData){
-          console.log(userData);
-          stripe.tokens.create({
-            card: {
-              "number": '4242424242424242',
-              "exp_month": 12,
-              "exp_year": 2017,
-              "cvc": '123'
-            }
-          }, function(err, token) {
-            // asynchronously called
-            console.log(token);
-            stripe.charges.create({
-              amount: req.body.price,
-              currency: 'usd',
-              source: token.id
-            }, {stripe_account: userData.stripe_user_id})
-            .then(function(newCharge){
-              console.log('charginggggg');
-              console.log(newCharge);
-              photo.status = 'sold';
-              photo.save(function(err, updatedPhoto){
-                console.log(updatedPhoto);
-                res.json(newCharge);
-              });
-            })
-          });
-        })
+        photo.save(function(err, updatedPhoto){
+          console.log(updatedPhoto);
+          res.header("Access-Control-Allow-Origin", "*");
+          res.json(newCharge);
+        });
+        /////stripe stuff, need to change credentials and then can add this back in
+        // request.post({
+        //   url: 'https://connect.stripe.com/oauth/token'
+        //   ,form: {
+        //     grant_type: "refresh_token"
+        //     ,refresh_token: req.body.refresh_token
+        //     ,client_secret: process.env.CLIENT_SECRET
+        //     ,client_id: process.env.CLIENT_ID
+        //   }
+        // }, function(err, r, userData){
+        //   console.log(userData);
+        //   stripe.tokens.create({
+        //     card: {
+        //       "number": '4242424242424242',
+        //       "exp_month": 12,
+        //       "exp_year": 2017,
+        //       "cvc": '123'
+        //     }
+        //   }, function(err, token) {
+        //     // asynchronously called
+        //     console.log(token);
+        //     stripe.charges.create({
+        //       amount: req.body.price,
+        //       currency: 'usd',
+        //       source: token.id
+        //     }, {stripe_account: userData.stripe_user_id})
+        //     .then(function(newCharge){
+        //       console.log('charginggggg');
+        //       console.log(newCharge);
+        //       photo.status = 'sold';
+        //       photo.save(function(err, updatedPhoto){
+        //         console.log(updatedPhoto);
+        //         res.header("Access-Control-Allow-Origin", "*");
+        //         res.json(newCharge);
+        //       });
+        //     })
+        //   });
+        // })
       }
       else if(req.body.status == 'rejected'){
         photo.status = 'rejected';
