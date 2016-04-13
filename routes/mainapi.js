@@ -17,6 +17,8 @@ var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
 var stripe            = require('stripe')(process.env.STRIPE_TEST_ID);
 var nodemailer        = require('nodemailer');
+var cors              = require('cors');
+console.log(cors);
 
 console.log(process.env.JWT_SECRET);
 // console.log(process.env.STRIPE_ID);
@@ -47,6 +49,7 @@ var Video       = require('../models/video.js');
 ///////////////////////////////////////////////////
 
 module.exports = function(app){
+  app.use(cors())
   app.get('/api/test', function(req, res){
     Photo.find({}, function(err, photos){
       res.json(photos);
