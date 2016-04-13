@@ -18,7 +18,7 @@ var youtubeVideo      = require('youtube-video-api');
 var stripe            = require('stripe')(process.env.STRIPE_TEST_ID);
 var nodemailer        = require('nodemailer');
 var cors              = require('cors');
-console.log(cors);
+var json2csv          = require('json2csv');
 
 console.log(process.env.JWT_SECRET);
 // console.log(process.env.STRIPE_ID);
@@ -564,6 +564,45 @@ module.exports = function(app){
     console.log('yo');
     res.json(process.env.STRIPE_ID)
   })
+
+  ///////function to convert financial data to an excel sheet and mail to the user
+  app.get('/api/toxls', function(req, res){
+    User.findOne({email: 'jack.connor83@gmail.com'}, function(err, data){
+      var userData = data;
+      console.log(userData);
+      var fields = ['name', 'email' ,'photos'];
+      json2csv({data: userData, fields: fields}, function(err, csv){
+        if(err){console.log(err)}
+        console.log(csv);
+        fs.writeFile('newcsv.csv', csv, function(){
+          ///start email stuff
+          var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
+          var mailOptions = {
+              from: '"Your Data" <jack.connor83@gmail.com>' // sender address
+              ,to: 'jack.connor83@gmail.com' // list of receivers
+              ,subject: 'Your Data (attached)' // Subject line
+              ,text: 'Thank you for your request' // plaintext body
+              ,html: '<b>here is your data</b>' // html body
+              ,attachments: [
+                {path: './newcsv.csv'}
+              ]
+
+          };
+
+          transporter.sendMail(mailOptions, function(error, info){
+              if(error){
+                  return console.log(error);
+              }
+              console.log('Message sent: ' + info.response);
+              res.json(csv)
+          });
+        });
+      })
+    })
+  })
+
+
+
   ////////////email functions///////
   //////////////////////////////////
 
