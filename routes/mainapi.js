@@ -89,6 +89,7 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
+    console.log('phhhhhhhhhhhhh');
     // console.log('body');
     // console.log(req.body);
     console.log(req.files);
@@ -133,6 +134,7 @@ module.exports = function(app){
     console.log(offsetY());
     console.log(offsetX());
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+      fs.unlink("./routes/uploads/"+filename)
       res.json(result);
     });
   })
@@ -231,6 +233,7 @@ module.exports = function(app){
     var destination = req.files[0].destination;
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+      fs.unlink('./routes/uploads/'+filename);
       res.json(result.secure_url)
     }, { resource_type: "video" });
   })
@@ -238,6 +241,18 @@ module.exports = function(app){
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
 
+  /////////////////////////////////////
+  /////////transaction calls///////////
+  app.post('/api/transactions/all', function(req, res){
+    console.log('tranny!');
+    Transaction.find({creator: req.body.userId})
+    .populate('photos')
+    .exec(function(err, transData){
+      res.json(transData);
+    });
+  })
+  /////////transaction calls///////////
+  /////////////////////////////////////
 
   //////submission calls
   //////////////////////
@@ -405,17 +420,25 @@ module.exports = function(app){
   ////////function to submit or reject a photo
   app.post('/api/photopurchase', function(req, res){
     var photoId = req.body.photoId;
-    // stripe.customers.create(
-    //   { description: "example@stripe.com" },
-    //   {stripe_account: req.body.access_token} // account's access token from the Connect flow
-    // );
+    var userId  = req.body.userId;
+    console.log(userId);
+    var transaction = new Transaction();
     Photo.findOne({'_id': photoId}, function(err, photo){
       if(req.body.status == 'sold'){
         photo.status = 'sold';
+        photo.price = req.body.price;
+        photo.transactions.push(transaction._id);
         photo.save(function(err, updatedPhoto){
           console.log(updatedPhoto);
-          res.header("Access-Control-Allow-Origin", "*");
-          res.json(updatedPhoto);
+          transaction.creator = userId;
+          transaction.photos = [photoId];
+          transaction.date =  new Date();
+          transaction.price = req.body.price;
+          transaction.save(function(err, newTrans){
+            console.log(newTrans);
+            res.header("Access-Control-Allow-Origin", "*");
+            res.json(newTrans);
+          })
         });
         /////stripe stuff, need to change credentials and then can add this back in
         // request.post({
@@ -566,8 +589,10 @@ module.exports = function(app){
   })
 
   ///////function to convert financial data to an excel sheet and mail to the user
-  app.get('/api/toxls', function(req, res){
-    User.findOne({email: 'jack.connor83@gmail.com'}, function(err, data){
+  app.post('/api/tocsv', function(req, res){
+    var email = req.body.email;
+    console.log(email);
+    User.findOne({email: email}, function(err, data){
       var userData = data;
       console.log(userData);
       var fields = ['name', 'email' ,'photos'];
@@ -588,21 +613,18 @@ module.exports = function(app){
               ]
 
           };
-
           transporter.sendMail(mailOptions, function(error, info){
               if(error){
                   return console.log(error);
               }
               console.log('Message sent: ' + info.response);
+              fs.unlink('./newcsv.csv')
               res.json(csv)
           });
         });
       })
     })
   })
-
-
-
   ////////////email functions///////
   //////////////////////////////////
 
