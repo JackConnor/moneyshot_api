@@ -411,10 +411,11 @@ module.exports = function(app){
     // );
     Photo.findOne({'_id': photoId}, function(err, photo){
       if(req.body.status == 'sold'){
+        photo.status = 'sold';
         photo.save(function(err, updatedPhoto){
           console.log(updatedPhoto);
           res.header("Access-Control-Allow-Origin", "*");
-          res.json(newCharge);
+          res.json(updatedPhoto);
         });
         /////stripe stuff, need to change credentials and then can add this back in
         // request.post({
