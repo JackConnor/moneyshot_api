@@ -231,10 +231,13 @@ module.exports = function(app){
 
   /////our first test post video call
   app.post('/api/upload/video', upload.array('file', 1), function(req, res){
+    console.log('something is happening');
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+      console.log('TTTTHHHHHUUUUUUUUUMMMMB');
+      // console.log(thumb);
       fs.unlink('./routes/uploads/'+filename);
       res.json(result.secure_url)
     }, { resource_type: "video" });
