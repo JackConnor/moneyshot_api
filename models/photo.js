@@ -6,6 +6,7 @@ var photoSchema = new Schema({
   ,submission: {type: Schema.Types.ObjectId, ref: "Submission"}
   ,transactions: [{type: Schema.Types.ObjectId, ref: "Transaction"}]
   ,url: String
+  ,thumbnail: String
   ,isVideo: Boolean
   ,photosubjects: Array
   ,location: String

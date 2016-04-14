@@ -128,14 +128,14 @@ module.exports = function(app){
         return 0;
       }
     }
-    console.log('coords');
-    console.log(height());
-    console.log(width());
-    console.log(offsetY());
-    console.log(offsetX());
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-      fs.unlink("./routes/uploads/"+filename)
-      res.json(result);
+      console.log(result);
+      cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
+        console.log(thumbResult);
+        fs.unlink("./routes/uploads/"+filename)
+        var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
+        res.json(photoObj);
+      }, {gravity: "face", width: 150, height: 150, crop: "thumb"});
     });
   })
 
@@ -152,11 +152,13 @@ module.exports = function(app){
   })
 
   app.post('/api/createphotos', function(req, res){
-    // console.log(req.body);
+    console.log('check hereereeeeeee');
+    console.log(req.body);
     var url = req.body.url;
-    Photo.create({url: url, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
+    var thumbnail = req.body.thumbnail;
+    Photo.create({url: url, thumbnail: thumbnail, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
       console.log('new photo object');
-      // console.log(newPhoto);
+      console.log(newPhoto);
       User.findOne({_id:req.body.userId}, function(err, user){
         user.photos.push(newPhoto._id);
         user.save(function(err, updatedUser){
