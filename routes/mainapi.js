@@ -570,7 +570,7 @@ module.exports = function(app){
             to: 'jack.connor83@gmail.com', // list of receivers
             subject: 'update password', // Subject line
             text: 'Thank you for signing up', // plaintext body
-            html: '<b>click the following link to get your new password: http://192.168.0.7:5000//#/new/password/'+userId+'</b>' // html body
+            html: '<b>click the following link to get your new password: http://mophocms.herokuapp.com/#/new/password/'+userId+'</b>' // html body
         };
 
         transporter.sendMail(mailOptions, function(error, info){
