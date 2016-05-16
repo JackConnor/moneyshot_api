@@ -89,9 +89,6 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
-    console.log('phhhhhhhhhhhhh');
-    // console.log('body');
-    // console.log(req.body);
     console.log(req.files);
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
@@ -136,7 +133,7 @@ module.exports = function(app){
         var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
         res.json(photoObj);
       }, {gravity: "face", width: 150, height: 150, crop: "thumb"});
-    });
+    }, {angle: 0});
   })
 
   ///////function to convert a photo for cropping
@@ -152,12 +149,9 @@ module.exports = function(app){
   })
 
   app.post('/api/createphotos', function(req, res){
-    console.log('check hereereeeeeee');
-    console.log(req.body);
     var url = req.body.url;
     var thumbnail = req.body.thumbnail;
     Photo.create({url: url, thumbnail: thumbnail, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
-      console.log('new photo object');
       console.log(newPhoto);
       User.findOne({_id:req.body.userId}, function(err, user){
         user.photos.push(newPhoto._id);
