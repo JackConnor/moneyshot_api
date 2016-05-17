@@ -600,7 +600,7 @@ module.exports = function(app){
         console.log(csv);
         fs.writeFile('newcsv.csv', csv, function(){
           ///start email stuff
-          var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
+          var transporter = nodemailer.createTransport('smtps://'+SMPT);
           var mailOptions = {
               from: '"Your Data" <jack.connor83@gmail.com>' // sender address
               ,to: 'jack.connor83@gmail.com' // list of receivers
