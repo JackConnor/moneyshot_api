@@ -6,6 +6,7 @@ var submissionSchema = new Schema({
   ,date: Date
   ,photos: [{type: Schema.Types.ObjectId, ref: "Photo"}]
   ,videos: [{type: Schema.Types.ObjectId, ref: "Photo"}]
+  ,metadata: Object
 })
 
 module.exports = mongoose.model('Submission', submissionSchema);

@@ -20,7 +20,7 @@ var nodemailer        = require('nodemailer');
 var cors              = require('cors');
 var json2csv          = require('json2csv');
 
-console.log(process.env.JWT_SECRET);
+console.log(process.env.SMTP);
 // console.log(process.env.STRIPE_ID);
 
 var server = new Lien({
@@ -259,6 +259,7 @@ module.exports = function(app){
   app.post('/api/new/submission', function(req, res){
     var submission = new Submission();
     submission.creator = req.body.userId;
+    submission.metadata = req.body.metaData;
     submission.photos[0] = req.body.photos[0];
     for (var i = 0; i < req.body.photos.length; i++) {
       submission.photos[i] = req.body.photos[i];
@@ -269,6 +270,7 @@ module.exports = function(app){
     // submission.videos = req.body.videos;
     submission.save(function(err, newSub){
       if(err){console.log(err)}
+      console.log(newSub);
       User.findOne({'_id': req.body.userId}, function(err, user){
         user.submissions.push(newSub._id)
         user.save(function(updatedUser){
@@ -493,7 +495,7 @@ module.exports = function(app){
   app.post('/api/signup/email', function(req, res){
     //////nodemailer stuff
     console.log(req.body);
-    var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
+    var transporter = nodemailer.createTransport('smtps://'+process.env.SMPT);
     var mailOptions = {
         from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
         to: req.body.userEmail, // list of receivers
@@ -550,29 +552,35 @@ module.exports = function(app){
     console.log(email);
 
     User.findOne({'email': email}, function(err, user){
+      console.log('errr');
       if(err) res.json(err);
       if(user !== null){
+        console.log('user');
         console.log(user);
         var userId = user._id;
         // console.log(userId);
         //
         // var hashId = bcrypt.hashSync(userId.toString(), 8);
         // console.log(hashId);
-        var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1zza@smtp.gmail.com');
+        var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
         var mailOptions = {
             from: '"New Password" <jack.connor83@gmail.com>', // sender address
-            to: 'jack.connor83@gmail.com', // list of receivers
+            to: email, // list of receivers
             subject: 'update password', // Subject line
             text: 'Thank you for signing up', // plaintext body
             html: '<b>click the following link to get your new password: http://mophocms.herokuapp.com/#/new/password/'+userId+'</b>' // html body
         };
+        console.log(transporter);
 
         transporter.sendMail(mailOptions, function(error, info){
             if(error){
-                return console.log(error);
+              console.log('transport error');
+              console.log(error);
             }
-            console.log('Message sent: ' + info.response);
-            res.json(info)
+            else{
+              console.log('Message sent: ' + info.response);
+              res.json(info)
+            }
         });
       }
       else {
@@ -600,7 +608,7 @@ module.exports = function(app){
         console.log(csv);
         fs.writeFile('newcsv.csv', csv, function(){
           ///start email stuff
-          var transporter = nodemailer.createTransport('smtps://'+SMPT);
+          var transporter = nodemailer.createTransport('smtps://'+process.env.SMPT);
           var mailOptions = {
               from: '"Your Data" <jack.connor83@gmail.com>' // sender address
               ,to: 'jack.connor83@gmail.com' // list of receivers
