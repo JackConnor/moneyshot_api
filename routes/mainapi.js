@@ -48,6 +48,8 @@ var Video       = require('../models/video.js');
 ///////////End Models//////////////////////////////
 ///////////////////////////////////////////////////
 
+var test = require( '../googlePlace.js' )
+
 module.exports = function(app){
 
   app.use(cors())
@@ -261,6 +263,16 @@ module.exports = function(app){
     submission.creator = req.body.userId;
     submission.metadata = req.body.metaData;
     submission.photos[0] = req.body.photos[0];
+
+    // Update metaData.location using googlePLaces API
+    if ( req.body.metaData.latitude && req.body.metaData.longitude ) {
+          googlePlacesInfo( {
+            id: submission._id,
+            latitude: req.body.metaData.latitude,
+            longittude: req.body.metaData.longitude
+          } )
+    }
+
     for (var i = 0; i < req.body.photos.length; i++) {
       submission.photos[i] = req.body.photos[i];
     }
