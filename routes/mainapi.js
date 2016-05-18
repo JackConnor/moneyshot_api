@@ -87,7 +87,7 @@ module.exports = function(app){
   app.get('/api/allPhotos', function(req, res){
     Photo.find({}, function(err, allPhotos){
       res.json(allPhotos);
-    })
+    });
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
@@ -152,8 +152,13 @@ module.exports = function(app){
 
   app.post('/api/createphotos', function(req, res){
     var url = req.body.url;
-    var thumbnail = req.body.thumbnail;
-    Photo.create({url: url, thumbnail: thumbnail, location: "los angeles", date: new Date(), photosubjects: ['kris jenner', 'kim kardashian', 'kanye west'], status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
+    if(req.body.isVid === true){
+      var thumbnail = req.body.url.split('').splice(0, req.body.url.length-4).join('')+".png";
+    }
+    else {
+      var thumbnail = req.body.thumbnail;
+    }
+    Photo.create({url: url, thumbnail: thumbnail, date: new Date(), status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
       console.log(newPhoto);
       User.findOne({_id:req.body.userId}, function(err, user){
         user.photos.push(newPhoto._id);
@@ -204,6 +209,17 @@ module.exports = function(app){
     })
   })
 
+  app.get('/api/all/submissions', function(req, res){
+    Submission.find({})
+    .populate({
+      path: 'photos'
+      ,model: 'Photo'
+    })
+    .exec(function(err, allSubmissions){
+      res.json(allSubmissions)
+    })
+  })
+
   ///////add a price and a status of "submitted" to any photo, menaing it's accepted into the system and sent back to the user
   app.post('/api/accepted/photo', function(req, res){
     Photo.findOne({_id: req.body._id}, function(err, thisPhoto){
@@ -232,11 +248,14 @@ module.exports = function(app){
     var destination = req.files[0].destination;
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-      console.log('TTTTHHHHHUUUUUUUUUMMMMB');
-      // console.log(thumb);
+      console.log(filename);
+      var thumbFilename = result.secure_url.split('').slice(0, result.secure_url.length-4).join('')+'.jpg';
+      console.log(filename);
+      console.log(result.secure_url);
+      console.log(thumbFilename);
       fs.unlink('./routes/uploads/'+filename);
       res.json(result.secure_url)
-    }, { resource_type: "video" });
+    }, { resource_type: "video"});
   })
 
   ///////////////end photo db calls////////////////////
@@ -282,11 +301,12 @@ module.exports = function(app){
     // submission.videos = req.body.videos;
     submission.save(function(err, newSub){
       if(err){console.log(err)}
+      console.log('new sub coming up');
       console.log(newSub);
       User.findOne({'_id': req.body.userId}, function(err, user){
         user.submissions.push(newSub._id)
         user.save(function(updatedUser){
-          res.json(updatedUser)
+          res.json(newSub)
         })
       })
     })
