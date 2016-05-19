@@ -2,7 +2,7 @@ var rp       = require('request-promise'),
 	mongoose = require('mongoose'),
 	Sub      = mongoose.model('Submission');
 
-var key = 'key=' + require('./.Dev.js').gPLaceKey
+var key = 'key=' + process.env.GPLACEID
 
 var gPlaceUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
 
