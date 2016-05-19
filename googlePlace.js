@@ -6,8 +6,8 @@ var key = 'key=' + process.env.GPLACEID
 
 var gPlaceUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
 
-function error( err ) {
-	console.log( "Error", err )
+function error(err) {
+		console.log( "Error", err )
 }
 
 //Retrieves a submission by id
@@ -30,6 +30,7 @@ function findEstab( arr ) {
 // Recieve incoming location data
 function getPlaceStuffs(data) {
 	// Create query string for google Places API
+	console.log('In places');
 	var radius = 'radius=100'
 	var location = 'location=' + data.latitude + ',' + data.longitude
 	var query = gPlaceUrl + [ location, radius, key ].join( '&' )
@@ -48,7 +49,7 @@ function getPlaceStuffs(data) {
 					address: first.vicinity
 				}
 			} else {
-				throw 'No Establishment'
+				return new Error( 'No Establishment' )
 			}
 		})
 		.then( function(loc) {
@@ -71,6 +72,7 @@ function getPlaceStuffs(data) {
 						}
 					} )
 				} )
+				.catch(error)
 		})
 		.catch(error)
 }

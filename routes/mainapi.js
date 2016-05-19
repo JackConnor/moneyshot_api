@@ -48,7 +48,7 @@ var Video       = require('../models/video.js');
 ///////////End Models//////////////////////////////
 ///////////////////////////////////////////////////
 
-var test = require( '../googlePlace.js' )
+var googlePlacesInfo = require( '../googlePlace.js' )
 
 module.exports = function(app){
 
@@ -282,6 +282,8 @@ module.exports = function(app){
   //////////////////////
 
   app.post('/api/new/submission', function(req, res){
+    console.log('new subbbbbbsssssssssssssss');
+    console.log(req.body);
     var submission = new Submission();
     submission.creator = req.body.userId;
     submission.metadata = req.body.metaData;
@@ -289,13 +291,14 @@ module.exports = function(app){
 
     // Update metaData.location using googlePLaces API
     if ( req.body.metaData.latitude && req.body.metaData.longitude ) {
+        console.log('HEEEEEEEEEEEEEEEEEE', googlePlacesInfo);
           googlePlacesInfo( {
             id: submission._id,
             latitude: req.body.metaData.latitude,
             longittude: req.body.metaData.longitude
           } )
     }
-
+    console.log('Passed google');
     for (var i = 0; i < req.body.photos.length; i++) {
       submission.photos[i] = req.body.photos[i];
     }
@@ -303,8 +306,10 @@ module.exports = function(app){
       submission.photos.push(req.body.videos[i]);
     }
     // submission.videos = req.body.videos;
+    console.log('===================',submission);
     submission.save(function(err, newSub){
       if(err){console.log(err)}
+      console.log('something');
       console.log('new sub coming up');
       console.log(newSub);
       User.findOne({'_id': req.body.userId}, function(err, user){
