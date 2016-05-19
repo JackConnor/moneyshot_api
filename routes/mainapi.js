@@ -64,7 +64,7 @@ module.exports = function(app){
 
   app.get( '/checkToken', function(req, res ) {
     res.json('Yesy')
-  } )
+  })
 
   app.get('/api/test', function(req, res){
     Photo.find({}, function(err, photos){
