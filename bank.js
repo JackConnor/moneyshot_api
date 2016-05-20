@@ -62,11 +62,9 @@ function genToken(req, res, next) {
 	var body = req.body || req.params || req.headers
 	var password = body.password
 	var userId = body.userId
-	console.log( 'REQ', req.body)
 	// Find user by email
 	User.findById(userId).exec()
 		.then(function(user){
-			console.log('USERIS', password, user.passwordDigest)
 			if (user){
 				// Check if password coming in matches one in db for user
 				bcrypt.compare(password, user.passwordDigest, function(err, isPass){
@@ -100,13 +98,11 @@ module.exports = function(app) {
 
 	bankRoutes.get( '/stripe/redirect_uri', function(req, res) {
 		// TODO make reirect to bankRoutes url if can
-		console.log( req.query )
 		res.redirect( 'http://localhost:8100/#/banking/' + req.query.code)
 		// res.json( 'Yes!' )
 	})
 
 	bankRoutes.post('/addStripe', auth, function(req, res) {
-		console.log('Trying to create account', req.body.stripe, req.decoded )
 		var query = {
 			method: 'POST',
 			uri: 'https://connect.stripe.com/oauth/token',
@@ -122,7 +118,6 @@ module.exports = function(app) {
 		}
 		rp( query)
 			.then(function(userData){
-				console.log( 'USERDATA', userData)
 				var stripe = JSON.parse( userData )
 				return User.findOneAndUpdate({_id: req.decoded.userId}, {
 					access_token: stripe.access_token,

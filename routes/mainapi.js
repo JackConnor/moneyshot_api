@@ -294,14 +294,12 @@ module.exports = function(app){
 
     // Update metaData.location using googlePLaces API
     if ( req.body.metaData.latitude && req.body.metaData.longitude ) {
-        console.log('HEEEEEEEEEEEEEEEEEE', googlePlacesInfo);
           googlePlacesInfo( {
             id: submission._id,
             latitude: req.body.metaData.latitude,
             longittude: req.body.metaData.longitude
           } )
     }
-    console.log('Passed google');
     for (var i = 0; i < req.body.photos.length; i++) {
       submission.photos[i] = req.body.photos[i];
     }
@@ -309,12 +307,8 @@ module.exports = function(app){
       submission.photos.push(req.body.videos[i]);
     }
     // submission.videos = req.body.videos;
-    console.log('===================',submission);
     submission.save(function(err, newSub){
       if(err){console.log(err)}
-      console.log('something');
-      console.log('new sub coming up');
-      console.log(newSub);
       User.findOne({'_id': req.body.userId}, function(err, user){
         user.submissions.push(newSub._id)
         user.save(function(updatedUser){
@@ -334,14 +328,11 @@ module.exports = function(app){
   /////////call to signup a new user
   app.post('/api/signup', function(req, res){
     var emailLower = req.body.email.toLowerCase();
-    console.log(emailLower);
     if(req.body.password){
       bcrypt.hash(req.body.password, 8, function(err, newHash){
         User.findOne({email: emailLower}, function(err, isEmail){
           if(isEmail == null){
             User.create({email: emailLower, passwordDigest: newHash, access_token: '', refresh_token: '', stripe_publishable_key: '', stripe_user_id: ''}, function(err, newUser){
-              console.log('new user');
-              console.log(newUser);
               res.json(newUser)
             })
           }
@@ -409,13 +400,7 @@ module.exports = function(app){
   // })
 
   app.get('/api/stripe/test/', function(req, res){
-    console.log(1);
-    // var token = req.body.token;
-    console.log(req.query);
-    console.log('yoyoyoyo');
     var token = req.query.code;
-    console.log(token);
-    // res.json(token);
     request.post({
       url: 'https://connect.stripe.com/oauth/token'
       ,form: {
@@ -426,12 +411,7 @@ module.exports = function(app){
       }
     }, function(err, r, userData){
       if(err){console.log(err)}
-      console.log('in the callback');
-      console.log(req.query.state);
-      console.log(userData);
       User.findOne({'_id':req.query.state}, function(err, user){
-        console.log('user coming');
-        console.log(user);
         user.access_token = JSON.parse(userData).access_token;
         user.refresh_token = JSON.parse(userData).refresh_token;
         user.stripe_user_id = JSON.parse(userData).stripe_user_id;
