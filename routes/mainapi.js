@@ -50,6 +50,7 @@ var Video       = require('../models/video.js');
 
 var test = require( '../googlePlace.js' )
 
+
 module.exports = function(app){
 
   app.use(cors())
@@ -61,6 +62,8 @@ module.exports = function(app){
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
   });
+
+  var bankApi = require('../bank.js')(app)
 
   app.get( '/checkToken', function(req, res ) {
     res.json('Yesy')
