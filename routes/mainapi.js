@@ -20,7 +20,6 @@ var nodemailer        = require('nodemailer');
 var cors              = require('cors');
 var json2csv          = require('json2csv');
 
-console.log(process.env.SMTP);
 // console.log(process.env.STRIPE_ID);
 
 var server = new Lien({
@@ -140,6 +139,7 @@ module.exports = function(app){
         console.log(thumbResult);
         fs.unlink("./routes/uploads/"+filename)
         var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
+        console.log(photoObj);
         res.json(photoObj);
       }, {gravity: "face", width: 150, height: 150, crop: "thumb"});
     }, {angle: 0});

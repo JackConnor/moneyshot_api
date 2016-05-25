@@ -103,6 +103,7 @@ module.exports = function(app) {
 	})
 
 	bankRoutes.post('/addStripe', auth, function(req, res) {
+		console.log(req.body);
 		var query = {
 			method: 'POST',
 			uri: 'https://connect.stripe.com/oauth/token',
@@ -110,7 +111,7 @@ module.exports = function(app) {
 				grant_type: "authorization_code"
 				,code: req.body.stripe
 				,client_secret: process.env.CLIENT_SECRET
-				,client_id: process.env.CLIENT_DI
+				,client_id: process.env.CLIENT_ID
 			}
 			,headers: {
 				'content-type': 'application/x-www-form-urlencoded'
