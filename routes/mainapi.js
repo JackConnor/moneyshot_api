@@ -293,13 +293,13 @@ module.exports = function(app){
     submission.photos[0] = req.body.photos[0];
 
     // Update metaData.location using googlePLaces API
-    if ( req.body.metaData.latitude && req.body.metaData.longitude ) {
-          googlePlacesInfo( {
-            id: submission._id,
-            latitude: req.body.metaData.latitude,
-            longittude: req.body.metaData.longitude
-          } )
-    }
+    // if ( req.body.metaData.latitude && req.body.metaData.longitude ) {
+    //       googlePlacesInfo( {
+    //         id: submission._id,
+    //         latitude: req.body.metaData.latitude,
+    //         longittude: req.body.metaData.longitude
+    //       } )
+    // }
     for (var i = 0; i < req.body.photos.length; i++) {
       submission.photos[i] = req.body.photos[i];
     }
@@ -520,6 +520,7 @@ module.exports = function(app){
     //////nodemailer stuff
     console.log(req.body);
     var transporter = nodemailer.createTransport('smtps://'+process.env.SMPT);
+    console.log(transporter);   
     var mailOptions = {
         from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
         to: req.body.userEmail, // list of receivers
@@ -530,6 +531,7 @@ module.exports = function(app){
 
     transporter.sendMail(mailOptions, function(error, info){
         if(error){
+          console.log(error);
             return console.log(error);
         }
         console.log('Message sent: ' + info.response);
