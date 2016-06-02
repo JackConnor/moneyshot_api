@@ -142,7 +142,7 @@ module.exports = function(app){
         console.log(photoObj);
         res.json(photoObj);
       }, {gravity: "face", width: 150, height: 150, crop: "thumb"});
-    }, {angle: 0});
+    }, {width: 1080, height: 1350, y: 280, crop: 'crop'});
   })
 
   ///////function to convert a photo for cropping
@@ -520,7 +520,7 @@ module.exports = function(app){
     //////nodemailer stuff
     console.log(req.body);
     var transporter = nodemailer.createTransport('smtps://'+process.env.SMPT);
-    console.log(transporter);   
+    console.log(transporter);
     var mailOptions = {
         from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
         to: req.body.userEmail, // list of receivers
