@@ -99,7 +99,7 @@ module.exports = function(app){
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
     console.log(req.files);
     var filename = req.files[0].filename;
-    var destination = req.files[0].destination;
+    var destination = req.files[0].destination; 
     var filePath = destination + filename;
     var width = function(){
       if(req.body.cloudCropImageWidth){
@@ -132,7 +132,7 @@ module.exports = function(app){
       else {
         return 0;
       }
-    } 
+    }
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       console.log(result);
       cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
