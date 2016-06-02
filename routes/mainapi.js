@@ -141,7 +141,7 @@ module.exports = function(app){
         var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
         console.log(photoObj);
         res.json(photoObj);
-      }, {gravity: "face", width: 150, height: 150, crop: "thumb"});
+      }, {gravity: "face", width: 150, height: 150, y: 55, crop: "crop"});
     }, {width: 1080, height: 1350, y: 280, crop: 'crop'});
   })
 
