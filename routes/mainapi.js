@@ -141,8 +141,8 @@ module.exports = function(app){
         var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
         console.log(photoObj);
         res.json(photoObj);
-      }, {gravity: "face", width: 150, height: 150, y: 55, crop: "crop"});
-    }, {width: 1080, height: 1350, y: 280, crop: 'crop'});
+      }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
+    }, {width: 1080, height: 1350, y: 290, crop: 'crop'});
   })
 
   ///////function to convert a photo for cropping
