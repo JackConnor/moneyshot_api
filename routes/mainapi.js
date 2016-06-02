@@ -99,7 +99,7 @@ module.exports = function(app){
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
     console.log(req.files);
     var filename = req.files[0].filename;
-    var destination = req.files[0].destination; 
+    var destination = req.files[0].destination;
     var filePath = destination + filename;
     var width = function(){
       if(req.body.cloudCropImageWidth){
@@ -241,10 +241,15 @@ module.exports = function(app){
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
     Photo.findOne({_id: req.body.photoId}, function(err, photo){
-      photo.status = 'rejected';
-      photo.save(function(err, updatedPhoto){
-        res.json(updatedPhoto);
-      })
+      if(photo){
+        photo.status = 'rejected';
+        photo.save(function(err, updatedPhoto){
+          res.json(updatedPhoto);
+        })
+      }
+      else {
+        res.json('no photo');
+      }
     })
   })
 
