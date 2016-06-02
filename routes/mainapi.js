@@ -132,7 +132,7 @@ module.exports = function(app){
       else {
         return 0;
       }
-    }
+    } 
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       console.log(result);
       cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
