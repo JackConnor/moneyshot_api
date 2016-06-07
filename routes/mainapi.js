@@ -202,14 +202,14 @@ module.exports = function(app){
   app.get('/api/usersubmissions/:userid', function(req, res){
     var userId = req.params.userid;
     User.findOne({_id: req.params.userid})
-    .populate({
-      path: 'submissions',
-      model: 'Submission',
-      populate: {
-        path: 'photos',
-        model: 'Photo',
-      }
-    })
+    // .populate({
+    //   path: 'submissions',
+    //   model: 'Submission',
+    //   populate: {
+    //     path: 'photos',
+    //     model: 'Photo',
+    //   }
+    // })
     .populate('photos')
     .exec(function(err, user){
       res.json(user);
