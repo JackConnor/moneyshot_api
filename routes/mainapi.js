@@ -262,7 +262,7 @@ module.exports = function(app){
           // submission.price = parseInt(submission.price) += parseInt(req.body.price);
           // submission.price += req.body.price;
           var oldPrice = parseInt(submission.price);
-          var newAdd = parseInt(req.body.price);
+          var newAdd = parseInt(req.body.price);//
           submission.price = oldPrice + newAdd;
           submission.save(function(err, newSub){
             console.log(newSub);
