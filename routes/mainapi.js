@@ -252,6 +252,7 @@ module.exports = function(app){
 
   ///////add a price and a status of "submitted" to any photo, menaing it's accepted into the system and sent back to the user
   app.post('/api/accepted/photo', function(req, res){
+    console.log(req.body);
     Photo.findOne({_id: req.body._id}, function(err, thisPhoto){
       thisPhoto.status = req.body.status;
       thisPhoto.price = req.body.price;
