@@ -257,7 +257,19 @@ module.exports = function(app){
       thisPhoto.status = req.body.status;
       thisPhoto.price = req.body.price;
       thisPhoto.save(function(err, updatedPhoto){
-        res.json(updatedPhoto);
+        Submission.findOne({"_id":req.body.submissionId}, function(err, submission){
+          console.log(submission);
+          // submission.price = parseInt(submission.price) += parseInt(req.body.price);
+          // submission.price += req.body.price;
+          var oldPrice = parseInt(submission.price);
+          var newAdd = parseInt(req.body.price);
+          submission.price = oldPrice + newAdd;
+          submission.save(function(err, newSub){
+            console.log(newSub);
+            if(err) throw err;
+              res.json(newSub);
+          })
+        })
       })
     })
   })
@@ -277,9 +289,9 @@ module.exports = function(app){
             console.log("----------------------");
             console.log("----------------------");
             submission.rejectedPhotosLength++
-            submission.save(function(err, submission){
-              console.log(submission);
-              res.json(updatedPhoto);
+            submission.save(function(err, newSubmission){
+              console.log(newSubmission);
+              res.json(newSubmission);
             })
           });
         });
