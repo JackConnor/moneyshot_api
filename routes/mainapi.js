@@ -212,6 +212,29 @@ module.exports = function(app){
     })
     // .populate('photos')
     .exec(function(err, user){
+      // console.log(user);
+      var length = user.submissions.length;
+      console.log(length);
+      //////now we add statuses to all of this
+      // for (var i = 0; i < length; i++) {
+      //
+      //   user.submissions[i].submissionPrice = 0;
+      //   var rejectPhotos = 0;
+      //
+      //   var photoLength = user.submissions[i].photos.length;
+      //   var photoSet = user.submissions[i].photos;
+      //   // console.log(photoSet);
+      //   console.log(user.submissions[i].submissionPrice);
+      //   for (var i = 0; i < photoLength; i++) {
+      //     if(photoSet[1].price > 0){
+      //       user.submissions[i].submissionPrice += photoSet[i].price;
+      //       console.log(user.submissions[i].submissionPrice);
+      //     }
+      //   }
+      // }
+
+      console.log(user);
+
       res.json(user);
     })
   })
@@ -240,12 +263,25 @@ module.exports = function(app){
 
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
+    // console.log(req.body);
     Photo.findOne({_id: req.body.photoId}, function(err, photo){
+      // console.log(photo);
       if(photo){
         photo.status = 'rejected';
         photo.save(function(err, updatedPhoto){
-          res.json(updatedPhoto);
-        })
+          // console.log(updatedPhoto);
+          Submission.findOne({'_id': req.body.submissionId}, function(err, submission){
+            console.log(submission);
+            console.log("----------------------");
+            console.log("----------------------");
+            console.log("----------------------");
+            submission.rejectedPhotosLength++
+            submission.save(function(err, submission){
+              console.log(submission);
+              res.json(updatedPhoto);
+            })
+          });
+        });
       }
       else {
         res.json('no photo');
@@ -296,6 +332,9 @@ module.exports = function(app){
     submission.creator = req.body.userId;
     submission.metadata = req.body.metaData;
     submission.photos[0] = req.body.photos[0];
+    submission.price = 0;
+    submission.rejectedPhotosLength = 0;
+    submission.status = "pending";
 
     // Update metaData.location using googlePLaces API
     // if ( req.body.metaData.latitude && req.body.metaData.longitude ) {
@@ -313,6 +352,7 @@ module.exports = function(app){
     }
     // submission.videos = req.body.videos;
     submission.save(function(err, newSub){
+      console.log(newSub);
       if(err){console.log(err)}
       User.findOne({'_id': req.body.userId}, function(err, user){
         user.submissions.push(newSub._id)
