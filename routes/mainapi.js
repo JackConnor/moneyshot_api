@@ -288,7 +288,9 @@ module.exports = function(app){
             console.log("----------------------");
             console.log("----------------------");
             console.log("----------------------");
-            submission.rejectedPhotosLength++
+            if(submission.rejectedPhotosLength){
+              submission.rejectedPhotosLength++
+            }
             submission.save(function(err, newSubmission){
               console.log(newSubmission);
               res.json(newSubmission);
