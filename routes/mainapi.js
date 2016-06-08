@@ -277,7 +277,7 @@ module.exports = function(app){
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
     // console.log(req.body);
-    Photo.findOne({_id: req.body.photoId}, function(err, photo){ 
+    Photo.findOne({_id: req.body.photoId}, function(err, photo){
       // console.log(photo);
       if(photo){
         photo.status = 'rejected';
@@ -288,7 +288,7 @@ module.exports = function(app){
             console.log("----------------------");
             console.log("----------------------");
             console.log("----------------------");
-            if(submission.rejectedPhotosLength){
+            if(submission.rejectedPhotosLength >= 0){
               submission.rejectedPhotosLength++
             }
             submission.save(function(err, newSubmission){
