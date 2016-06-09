@@ -30,9 +30,9 @@ var server = new Lien({
 // console.log(server);
 ///////cloudinary configuration
 cloudinary.config({
-  cloud_name: "drjseeoep"
-  ,api_key: 632163526492235
-  ,api_secret: 'otIFpH0cDOvG5Rn2L2Dorpq_n4Y'
+  cloud_name: "dp75xnjl6"
+  ,api_key: 985739568464193
+  ,api_secret: '5SEBJMEOezQCZ_rBx47vIRKbV2g'
 });
 
 ///////////////////////////////////////////////////
