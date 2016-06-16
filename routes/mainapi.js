@@ -325,7 +325,7 @@ module.exports = function(app){
   app.post('/api/temp/video', upload.array('file', 1), function(req, res){
     console.log('pinged');
     console.log(req.body);
-    // var filename = req.files[0].filename;
+    var filename = req.files[0].filename;
     // var tempVideo = req.body.video;
     // var userId = req.body.userId;
     // var tempVideo = new Photo();
