@@ -474,10 +474,24 @@ module.exports = function(app){
   /////////////////////////////////////////////////////
 
   /////get all user info
-  app.post('/api/userinfo', function(req, res){
-    var decodedToken = jwt.verify(req.body.token, process.env.JWT_SECRET);
+  app.get('/api/get/userinfo/:token', function(req, res){
+    var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
     console.log(decodedToken);
-    User.findOne({"_id": decodedToken.userId}, function(err, userInfo){
+    User.findOne({"_id": decodedToken.userId})
+    .populate({
+      path: 'submissions',
+      model: 'Submission',
+      populate: {
+        path: 'photos',
+        model: 'Photo',
+      }
+    })
+    .populate('tempVideoCache')
+    // .populate({
+    //   path: 'tempVideoCache',
+    //   model: 'Photo'
+    // })
+    .exec(function(err, userInfo){
       res.json(userInfo);
     })
   })
