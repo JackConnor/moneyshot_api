@@ -323,6 +323,8 @@ module.exports = function(app){
 
   /////////temporary video cache call
   app.post('/api/temp/video', upload.array('file', 1), function(req, res){
+    console.log('pinged');
+    console.log(req.body);
     // var filename = req.files[0].filename;
     // var tempVideo = req.body.video;
     // var userId = req.body.userId;
