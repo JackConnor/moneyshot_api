@@ -376,7 +376,9 @@ module.exports = function(app){
     var submission = new Submission();
     submission.creator = req.body.userId;
     submission.metadata = req.body.metaData;
-    submission.photos[0] = req.body.photos[0];
+    if(req.body.photos[0] !== undefined){
+      submission.photos[0] = req.body.photos[0];
+    } 
     submission.price = 0;
     submission.rejectedPhotosLength = 0;
     submission.status = "pending";
@@ -390,17 +392,22 @@ module.exports = function(app){
     //       } )
     // }
     for (var i = 0; i < req.body.photos.length; i++) {
-      submission.photos[i] = req.body.photos[i];
+      if(req.body.photos[i] !== undefined){
+        submission.photos[i] = req.body.photos[i];
+      }
     }
     for (var i = 0; i < req.body.videos.length; i++) {
-      submission.photos.push(req.body.videos[i]);
+      if(req.body.videos[i] !== undefined){
+        submission.photos.push(req.body.videos[i]);
+      }
     }
     // submission.videos = req.body.videos;
     submission.save(function(err, newSub){
       console.log(newSub);
       if(err){console.log(err)}
       User.findOne({'_id': req.body.userId}, function(err, user){
-        user.submissions.push(newSub._id)
+        user.submissions.push(newSub._id);
+        user.tempVideoCache = [];
         user.save(function(updatedUser){
           res.json(newSub)
         })
