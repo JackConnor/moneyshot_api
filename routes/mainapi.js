@@ -334,7 +334,7 @@ module.exports = function(app){
     /////cloudinary stuff
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       var tempVidUrl = result.secure_url;
-      tempVideo.url = tempVidUrl;
+      tempVideo.url = tempVidUrl;   
 
       User.findOne({'_id':userId}, function(err, user){
         console.log(user);
