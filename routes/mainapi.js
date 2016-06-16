@@ -326,26 +326,26 @@ module.exports = function(app){
     console.log('pinged');
     console.log(req.body);
     var filename = req.files[0].filename;
-    // var tempVideo = req.body.video;
-    // var userId = req.body.userId;
-    // var tempVideo = new Photo();
-    // tempVideo.creator = userId;
-    // tempVideo.isBoolean = true;
-    // tempVideo.date = new Date();
+    var userId = req.body.userId;
+    var tempVideo = new Photo();
+    tempVideo.creator = userId;
+    tempVideo.isBoolean = true;
+    tempVideo.date = new Date();
 
     /////cloudinary stuff
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
       console.log(result);
-      // var tempVidUrl = result.secure_url;
-      // tempVideo.url = tempVidUrl;
-      //
-      // User.findOne({'_id':userId}, function(err, user){
-      //   console.log(user);
-      //   user.tempVideoCache.push(tempVideo._id);
-      //   user.save(function(err, newUser){
-      //     res.json(newUser);
-      //   })
-      // });
+      var tempVidUrl = result.secure_url;
+      tempVideo.url = tempVidUrl;
+      tempVideo.save(function(savedVideo){
+        User.findOne({'_id':userId}, function(err, user){
+          console.log(user);
+          user.tempVideoCache.push(savedVideo._id);
+          user.save(function(err, newUser){
+            res.json(newUser);
+          })
+        });
+      })
     }, { resource_type: "video"});
   })
 
