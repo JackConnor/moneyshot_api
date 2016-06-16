@@ -15,6 +15,7 @@ var userSchema = new Schema({
   ,lastname: String
   ,email: String
   ,passwordDigest: String
+  ,tempVideoCache: [{type: Schema.Types.ObjectId, ref: "Photo"}]
 })
 
 module.exports = mongoose.model('User', userSchema);
