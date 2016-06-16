@@ -337,7 +337,9 @@ module.exports = function(app){
       console.log(result);
       var tempVidUrl = result.secure_url;
       tempVideo.url = tempVidUrl;
-      tempVideo.save(function(savedVideo){
+      tempVideo.save(function(err, savedVideo){
+        if(err){throw err}
+        console.log(savedVideo);
         User.findOne({'_id':userId}, function(err, user){
           console.log(user);
           user.tempVideoCache.push(savedVideo._id);
