@@ -343,6 +343,7 @@ module.exports = function(app){
         User.findOne({'_id':userId}, function(err, user){
           console.log(user);
           user.tempVideoCache.push(savedVideo._id);
+          fs.unlink('./routes/uploads/'+filename);
           user.save(function(err, newUser){
             res.json(newUser);
           })
@@ -378,7 +379,7 @@ module.exports = function(app){
     submission.metadata = req.body.metaData;
     if(req.body.photos[0] !== undefined){
       submission.photos[0] = req.body.photos[0];
-    } 
+    }
     submission.price = 0;
     submission.rejectedPhotosLength = 0;
     submission.status = "pending";
