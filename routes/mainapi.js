@@ -475,7 +475,9 @@ module.exports = function(app){
 
   /////get all user info
   app.post('/api/userinfo', function(req, res){
-    User.findOne({"_id": req.body.userId}, function(err, userInfo){
+    var decodedToken = jwt.verify(req.body.token, process.env.JWT_SECRET);
+    console.log(decodedToken);
+    User.findOne({"_id": decodedToken.userId}, function(err, userInfo){
       res.json(userInfo);
     })
   })
