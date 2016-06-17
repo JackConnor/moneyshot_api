@@ -158,6 +158,9 @@ module.exports = function(app){
   })
 
   app.post('/api/createphotos', function(req, res){
+    console.log('create photo body');
+    console.log(req.body);
+    console.log('end body');
     var url = req.body.url;
     if(req.body.isVid === true){
       var thumbnail = req.body.url.split('').splice(0, req.body.url.length-4).join('')+".png";
