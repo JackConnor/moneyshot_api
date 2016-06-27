@@ -258,15 +258,15 @@ module.exports = function(app){
     console.log(req.body);
     Photo.findOne({_id: req.body._id}, function(err, thisPhoto){
       thisPhoto.status = req.body.status;
-      thisPhoto.price = req.body.price;
+      // thisPhoto.price = req.body.price;
       thisPhoto.save(function(err, updatedPhoto){
         Submission.findOne({"_id":req.body.submissionId}, function(err, submission){
           console.log(submission);
           // submission.price = parseInt(submission.price) += parseInt(req.body.price);
           // submission.price += req.body.price;
-          var oldPrice = parseInt(submission.price);
-          var newAdd = parseInt(req.body.price);//
-          submission.price = oldPrice + newAdd;
+          // var oldPrice = parseInt(submission.price);
+          // var newAdd = parseInt(req.body.price);//
+          // submission.price = oldPrice + newAdd;
           submission.save(function(err, newSub){
             console.log(newSub);
             if(err) throw err;
