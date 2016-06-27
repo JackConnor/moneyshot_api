@@ -279,15 +279,11 @@ module.exports = function(app){
 
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
-    console.log(req.body);
     Photo.findOne({_id: req.body.photoId}, function(err, photo){
-      console.log(photo);
       if(photo){
         photo.status = 'rejected';
         photo.save(function(err, updatedPhoto){
-          console.log(updatedPhoto);
           Submission.findOne({'_id': req.body.submissionId}, function(err, submission){
-            console.log(submission);
             console.log("----------------------");
             console.log("----------------------");
             console.log("----------------------");
@@ -297,9 +293,7 @@ module.exports = function(app){
             else {
               submission.rejectedPhotosLength = 1;
             }
-            console.log(submission);
             submission.save(function(err, newSubmission){
-              console.log(newSubmission);
               res.json(newSubmission);
             })
           });
