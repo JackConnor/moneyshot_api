@@ -188,49 +188,55 @@ module.exports = function(app){
   app.post('/api/soldphoto', function(req, res) {
     var photoId = req.body.photoId,
         price   = req.body.photoPrice;
+        purchaser = req.body.purchaser;
     Photo.findById(photoId).populate('creator').exec()
       .then(function(photo){
         photo.price = price
         photo.status = 'sold'
-        photo.save(function(err, newPhoto){
-          if (err) {
-            throw err;
+        Transaction.create({date: new Date(), purchaser: purchaser, price: price, creator: photo.creator}, function(err, newTrans){
+          console.log('new traaaaaans');
+          console.log(newTrans);
+          console.log('that was the trans?');
+          photo.transactions.push(newTrans._id)
+          photo.save(function(err, newPhoto){
+            if (err) {
+              throw err;
+            }
+          })
+          if (!photo.creator) {
+            res.json('Couldnt find a user')
+            return
           }
+          // var smtpEmail = process.env.SMPT || 'jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com'
+          var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
+          var mailOptions = {
+              from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
+              to: photo.creator.email, // list of receivers
+              subject: 'Sold photo! ✔', // Subject line
+              text: 'Your photo, ' + photo.url + ' was sold for $' + price , // plaintext body
+              html: '<b>Your photo, ' + photo.url + ' was sold for $' + price + ' Here is a horse 🐴</b>' // html body
+          };
+
+          transporter.sendMail(mailOptions, function(error, info){
+              if(error){
+                console.log(error);
+                // if (cnt < 3) {
+                  // sendSold(photo, ++cnt);
+                // } else {
+                  res.json({
+                    message:'Error sending email',
+                    error: error
+                  })
+                  throw error
+                }
+              // }
+              res.json({
+                message: 'Success',
+                photo: photo
+              })
+              console.log('Message sent to ' + photo.creator.email + ': ' + info.response);
+          });
         })
-        if (!photo.creator) {
-          res.json('Couldnt find a user')
-          return
-        }
-        // var smtpEmail = process.env.SMPT || 'jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com'
-        var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
-        var mailOptions = {
-            from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
-            to: photo.creator.email, // list of receivers
-            subject: 'Sold photo! ✔', // Subject line
-            text: 'Your photo, ' + photo.url + ' was sold for $' + price , // plaintext body
-            html: '<b>Your photo, ' + photo.url + ' was sold for $' + price + ' Here is a horse 🐴</b>' // html body
-        };
-
-        transporter.sendMail(mailOptions, function(error, info){
-            if(error){
-              console.log(error);
-              // if (cnt < 3) {
-                // sendSold(photo, ++cnt);
-              // } else {
-                res.json({
-                  message:'Error sending email',
-                  error: error
-                })
-                throw error
-              }
-            // }
-            res.json({
-              message: 'Success',
-              photo: photo
-            })
-            console.log('Message sent to ' + photo.creator.email + ': ' + info.response);
-        });
-
       })
       .catch(function(err){
         console.log('Error updating!', err)

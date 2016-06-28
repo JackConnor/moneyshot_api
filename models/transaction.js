@@ -5,6 +5,7 @@ var transactionSchema = new Schema({
   photos: [{type: Schema.Types.ObjectId, ref: "Photo"}]
   ,creator: {type: Schema.Types.ObjectId, ref: "User"}
   ,price: Number
+  ,purchaser: String
   ,date: Date
 })
 
