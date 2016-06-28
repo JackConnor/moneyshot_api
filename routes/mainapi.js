@@ -23,11 +23,11 @@ var json2csv          = require('json2csv');
 
 // console.log(process.env.STRIPE_ID);
 
-var server = new Lien({
-    host: "localhost"
-    ,port: 5555
-    ,root: __dirname + "/public"
-});
+// var server = new Lien({
+//     host: "localhost"
+//     ,port: 5555
+//     ,root: __dirname + "/public"
+// });
 // console.log(server);
 ///////cloudinary configuration
 cloudinary.config({
@@ -858,9 +858,9 @@ module.exports = function(app){
 
 
 // Listen for load
-server.on("load", function (err) {
-    console.log(err || "Server started on port 5555.");
-    err && process.exit(1);
-});
+// server.on("load", function (err) {
+//     console.log(err || "Server started on port 5555.");
+//     err && process.exit(1);
+// });
 
 mongoose.connect("mongodb://jackconnor:Skateboard1@ds011308.mongolab.com:11308/moneyshot_db");
