@@ -17,6 +17,7 @@ var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
 var stripe            = require('stripe')(process.env.STRIPE_TEST_ID);
 var nodemailer        = require('nodemailer');
+console.log(nodemailer);
 var cors              = require('cors');
 var json2csv          = require('json2csv');
 
@@ -264,6 +265,7 @@ module.exports = function(app){
     console.log(req.body);
     Photo.findOne({_id: req.body._id}, function(err, thisPhoto){
       thisPhoto.status = req.body.status;
+      thisPhoto.submission = req.body.submissionId
       // thisPhoto.price = req.body.price;
       thisPhoto.save(function(err, updatedPhoto){
         Submission.findOne({"_id":req.body.submissionId})
@@ -291,7 +293,7 @@ module.exports = function(app){
           submission.save(function(err, newSub){
             console.log(newSub);
             if(err) throw err;
-              res.json(newSub);
+              res.json(updatedPhoto);
           })
         })
       })
@@ -698,6 +700,32 @@ module.exports = function(app){
         }
         console.log('Message sent: ' + info.response);
         res.json(info)
+    });
+  })
+
+  app.post('/api/emailallphotos', function(req, res){
+    var emailCache = req.body.emailCache;
+    console.log(emailCache);
+    var transporter = nodemailer.createTransport('smtps://'+process.env.SMPT);
+    console.log(transporter);
+    var mailOptions = {
+        from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
+        // to: req.body.userEmail, // list of receivers
+        to: 'jack.connor83@gmail.com', // list of receivers
+        subject: 'Here are your photos', // Subject line
+        text: 'Here you go', // plaintext body
+        html: '<h1><b>Boom!</b></h1>' // html body
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if(error){
+        console.log(error);
+          res.json(error);
+      }
+      else {
+        console.log('Message sent: ' + info.response);
+        res.json(info)
+      }
     });
   })
 
