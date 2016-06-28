@@ -17,7 +17,6 @@ var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
 var stripe            = require('stripe')(process.env.STRIPE_TEST_ID);
 var nodemailer        = require('nodemailer');
-console.log(nodemailer);
 var cors              = require('cors');
 var json2csv          = require('json2csv');
 
@@ -184,6 +183,62 @@ module.exports = function(app){
         })
       })
     })
+  })
+
+  app.post('/api/soldphoto', function(req, res) {
+    var photoId = req.body.photoId,
+        price   = req.body.photoPrice;
+    Photo.findById(photoId).populate('creator').exec()
+      .then(function(photo){
+        photo.price = price
+        photo.status = 'sold'
+        photo.save(function(err, newPhoto){
+          if (err) {
+            throw err;
+          }
+        })
+        if (!photo.creator) {
+          res.json('Couldnt find a user')
+          return
+        }
+        // var smtpEmail = process.env.SMPT || 'jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com'
+        var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
+        var mailOptions = {
+            from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
+            to: photo.creator.email, // list of receivers
+            subject: 'Sold photo! ✔', // Subject line
+            text: 'Your photo, ' + photo.url + ' was sold for $' + price , // plaintext body
+            html: '<b>Your photo, ' + photo.url + ' was sold for $' + price + ' Here is a horse 🐴</b>' // html body
+        };
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if(error){
+              console.log(error);
+              // if (cnt < 3) {
+                // sendSold(photo, ++cnt);
+              // } else {
+                res.json({
+                  message:'Error sending email',
+                  error: error
+                })
+                throw error
+              }
+            // }
+            res.json({
+              message: 'Success',
+              photo: photo
+            })
+            console.log('Message sent to ' + photo.creator.email + ': ' + info.response);
+        });
+
+      })
+      .catch(function(err){
+        console.log('Error updating!', err)
+        res.json({
+          message: 'Error',
+          error: err
+        })
+      })
   })
 
   app.get('/api/all/photos', function(req, res){
@@ -473,6 +528,7 @@ module.exports = function(app){
   /////////////////////////////////////////////////////
   /////////////Begin Authorization calls///////////////
 
+// User.findOne({email: 'gpynes@gmail.com'}).exec().then(function(user) {console.log('ME', user)})
   /////////call to signup a new user
   app.post('/api/signup', function(req, res){
     var emailLower = req.body.email.toLowerCase();
@@ -480,7 +536,27 @@ module.exports = function(app){
       bcrypt.hash(req.body.password, 8, function(err, newHash){
         User.findOne({email: emailLower}, function(err, isEmail){
           if(isEmail == null){
+            var smtpEmail = process.env.SMPT || 'jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com'
             User.create({email: emailLower, passwordDigest: newHash, access_token: '', refresh_token: '', stripe_publishable_key: '', stripe_user_id: ''}, function(err, newUser){
+              var transporter = nodemailer.createTransport(smtpEmail);
+              console.log(transporter);
+              var mailOptions = {
+                  from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
+                  to: emailLower, // list of receivers
+                  subject: 'New Mopho Account ✔', // Subject line
+                  text: 'Thank you for signing up', // plaintext body
+                  html: '<b>Thank you for signing up! Here is a horse 🐴</b>' // html body
+              };
+
+              transporter.sendMail(mailOptions, function(error, info){
+                  if(error){
+                    console.log(error);
+                      return;
+                  }
+                  console.log('Message sent: ' + info.response);
+                  return;
+              });
+
               res.json(newUser)
             })
           }
@@ -765,11 +841,14 @@ module.exports = function(app){
 
   app.post('/api/newpw/request', function(req, res){
     var email = req.body.userEmail;
-    console.log(email);
+    console.log('EMAIL', email);
 
     User.findOne({'email': email}, function(err, user){
       console.log('errr');
-      if(err) res.json(err);
+      if(err) {
+        res.json(err)
+        return
+      };
       if(user !== null){
         console.log('user');
         console.log(user);
@@ -858,9 +937,9 @@ module.exports = function(app){
 
 
 // Listen for load
-server.on("load", function (err) {
-    console.log(err || "Server started on port 5555.");
-    err && process.exit(1);
-});
+// server.on("load", function (err) {
+//     console.log(err || "Server started on port 5555.");
+//     err && process.exit(1);
+// });
 
 mongoose.connect("mongodb://jackconnor:Skateboard1@ds011308.mongolab.com:11308/moneyshot_db");
