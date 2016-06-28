@@ -96,6 +96,12 @@ module.exports = function(app){
     });
   })
 
+  app.get('/api/allSavedPhotos', function(req, res){
+    Photo.find({status: "offered for sale"}, function(err, allSavedPhotos){
+      res.json(allSavedPhotos);
+    });
+  })
+
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
     console.log(req.files);
     var filename = req.files[0].filename;
@@ -260,8 +266,23 @@ module.exports = function(app){
       thisPhoto.status = req.body.status;
       // thisPhoto.price = req.body.price;
       thisPhoto.save(function(err, updatedPhoto){
-        Submission.findOne({"_id":req.body.submissionId}, function(err, submission){
+        Submission.findOne({"_id":req.body.submissionId})
+        .populate('photos')
+        .exec(function(err, submission){
           console.log(submission);
+          var stillPendingCount = submission.photos.length;
+          console.log(stillPendingCount);
+          for (var i = 0; i < submission.photos.length; i++) {
+            console.log(i);
+            console.log(submission.photos[i].status);
+            if(submission.photos[i].status === 'submitted for sale'){
+              stillPendingCount--;
+            }
+            if(i==submission.photos.length-1 && stillPendingCount === submission.photos.length){
+              submission.status = "completely processed";
+              console.log('donezoooooooooooo!!!!!!!!!!');
+            }
+          }
           // submission.price = parseInt(submission.price) += parseInt(req.body.price);
           // submission.price += req.body.price;
           // var oldPrice = parseInt(submission.price);
@@ -277,13 +298,25 @@ module.exports = function(app){
     })
   })
 
+  app.post('/api/accepted/savedPhoto', function(req, res){
+    Photo.findOne({_id: req.body._id}, function(err, data){
+      console.log(data);
+      data.status = req.body.status;
+      data.save(function(err, updatedPhoto){
+        res.json(updatedPhoto)
+      })
+    })
+  })
+
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
     Photo.findOne({_id: req.body.photoId}, function(err, photo){
       if(photo){
         photo.status = 'rejected';
         photo.save(function(err, updatedPhoto){
-          Submission.findOne({'_id': req.body.submissionId}, function(err, submission){
+          Submission.findOne({'_id': req.body.submissionId})
+          .populate('photos')
+          .exec(function(err, submission){
             console.log("----------------------");
             console.log("----------------------");
             console.log("----------------------");
@@ -292,6 +325,20 @@ module.exports = function(app){
             }
             else {
               submission.rejectedPhotosLength = 1;
+            }
+            //////thsi check that submission isn't all processed
+            var stillPendingCount = submission.photos.length;
+            console.log(stillPendingCount);
+            for (var i = 0; i < submission.photos.length; i++) {
+              console.log(i);
+              console.log(submission.photos[i].status);
+              if(submission.photos[i].status === 'submitted for sale'){
+                stillPendingCount--;
+              }
+              if(i==submission.photos.length-1 && stillPendingCount === submission.photos.length){
+                submission.status = "completely processed";
+                console.log('donezoooooooooooo!!!!!!!!!!');
+              }
             }
             submission.save(function(err, newSubmission){
               res.json(newSubmission);
