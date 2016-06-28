@@ -34,14 +34,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 var router = require('./routes/mainapi.js')(app);
-
+var cms = require('../moneyshot_cms_v2/server.js');
 // require('./passport.js')(passport);
+app.use(function(req, res, next) {
+  console.log('=============', req.path)
+  if (req.path == '/cms' ) {
+    res.redirect('http://localhost:5000/')
+    return
+  }
+  next()
+})
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
+
 // error handlers
 
 // development error handler
@@ -66,7 +76,9 @@ app.use(function(err, req, res, next) {
   });
 });
 
-app.listen(process.env.PORT || '5555' || 80 || 443);
+app.listen(process.env.PORT || '5555' || 80 || 443, function() {
+  console.log('Up1')
+});
 
 app.get('*', function(req, res){
 
