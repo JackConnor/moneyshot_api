@@ -259,6 +259,13 @@ module.exports = function(app){
     })
   })
 
+  app.get('/api/photo/batch', function(req, res){
+
+    Photo.findOne({_id: req.params.id}, function(err, photo){
+      res.json(photo);
+    })
+  })
+
   //////get all photos from a single user
   app.get('/api/userphoto/:userid', function(req, res){
     var userId = req.params.userid;
@@ -362,6 +369,7 @@ module.exports = function(app){
   })
 
   app.post('/api/accepted/savedPhoto', function(req, res){
+    console.log(req.body);
     Photo.findOne({_id: req.body._id}, function(err, data){
       console.log(data);
       data.status = req.body.status;
