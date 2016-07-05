@@ -618,6 +618,24 @@ module.exports = function(app){
     var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
     res.json(decodedToken);
   })
+
+  app.post('/api/checktokensignin', function(req, res){
+    console.log(req.body);
+    console.log(typeof req.body.token);
+    var token = req.body.token;
+    console.log(token);
+    if(token !== null && token !== "null"){
+      var decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      console.log(decodedToken);
+      var newToken = jwt.sign({userId: decodedToken.userId, active: true}, process.env.JWT_SECRET);
+      console.log(newToken);
+      res.json(newToken);
+    }
+    else {
+      console.log('nope');
+      res.json('no token');
+    }
+  })
   ///////////////end Authorization calls///////////////
   /////////////////////////////////////////////////////
 
