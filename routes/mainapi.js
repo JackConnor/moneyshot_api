@@ -492,8 +492,7 @@ module.exports = function(app){
     var transporter = nodemailer.createTransport("SMTP", {
       service: "Gmail",
       auth: {
-         user: "jack.connor83@gmail.com",
-         pass: "FreezerP1"
+
       }
     });
     console.log(transporter);
@@ -503,7 +502,7 @@ module.exports = function(app){
         to: req.body.email, // list of receivers
         subject: 'Your MoPho Video', // Subject line
         text: "Here's your video: "+req.body.videoUrl, // plaintext body
-        html: "<b>Here's your video: </b>"+req.body.videoUrl+"<br>(click to download, on desktop)" // html body
+        html: "<b>Here's your video: </b>"+req.body.videoUrl+"<br>(Click to download, on desktop. View-only on most mobile devices.)" // html body
     };
     console.log(mailOptions);
     transporter.sendMail(mailOptions, function(error, info){
