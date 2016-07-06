@@ -474,6 +474,50 @@ module.exports = function(app){
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
 
+
+  ////////call to send a users vidoe to their email address
+  app.post('/api/email/video', function(req, res){
+    console.log(req.body);
+    // var transporter = nodemailer.createTransport(smtpEmail);
+    // var transporter = nodemailer.createTransport({
+    //   service: 'Gmail',
+    //   auth: {
+    //     user: 'jack.connor83@gmail.com', // Your email id
+    //     pass: 'FreezerP1' // Your password
+    //   }
+    // });
+    // var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
+    // var smtpEmail = "jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com"
+    // var transporter = nodemailer.createTransport(smtpEmail);
+    var transporter = nodemailer.createTransport("SMTP", {
+      service: "Gmail",
+      auth: {
+         user: "jack.connor83@gmail.com",
+         pass: "FreezerP1"
+      }
+    });
+    console.log(transporter);
+    console.log(transporter);
+    var mailOptions = {
+        from: '"MoPho" <jack.connor83@gmail.com>', // sender address
+        to: req.body.email, // list of receivers
+        subject: 'Your MoPho Video', // Subject line
+        text: "Here's your video: "+req.body.videoUrl, // plaintext body
+        html: "<b>Here's your video: </b>"+req.body.videoUrl+"<br>(click to download, on desktop)" // html body
+    };
+    console.log(mailOptions);
+    transporter.sendMail(mailOptions, function(error, info){
+      console.log('email sent');
+        if(error){
+          console.log(error);
+            return;
+        }
+        console.log(info);
+        console.log('Message sent: ' + info.response);
+        res.json('email sent')
+    });
+  })
+
   /////////////////////////////////////
   /////////transaction calls///////////
   app.post('/api/transactions/all', function(req, res){
