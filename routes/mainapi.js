@@ -492,11 +492,11 @@ module.exports = function(app){
     var transporter = nodemailer.createTransport("SMTP", {
       service: "Gmail",
       auth: {
-
+         user: process.env.EMAIL,
+         pass: process.env.EMAILPASSWORD
       }
     });
-    console.log(transporter);
-    console.log(transporter);
+    console.log(process.env);
     var mailOptions = {
         from: '"MoPho" <jack.connor83@gmail.com>', // sender address
         to: req.body.email, // list of receivers
@@ -504,7 +504,6 @@ module.exports = function(app){
         text: "Here's your video: "+req.body.videoUrl, // plaintext body
         html: "<b>Here's your video: </b>"+req.body.videoUrl+"<br>(Click to download, on desktop. View-only on most mobile devices.)" // html body
     };
-    console.log(mailOptions);
     transporter.sendMail(mailOptions, function(error, info){
       console.log('email sent');
         if(error){
