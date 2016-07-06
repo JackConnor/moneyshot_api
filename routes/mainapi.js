@@ -658,7 +658,7 @@ module.exports = function(app){
 
   app.get('/api/decodetoken/:token', function(req, res){
     var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
-    res.json(decodedToken);
+    res.json(decodedToken); 
   })
 
   app.post('/api/checktokensignin', function(req, res){
