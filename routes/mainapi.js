@@ -17,6 +17,7 @@ var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
 var stripe            = require('stripe')(process.env.STRIPE_TEST_ID);
 var nodemailer        = require('nodemailer');
+var smtpTransport     = require('nodemailer-smtp-transport');
 var cors              = require('cors');
 var json2csv          = require('json2csv');
 
@@ -479,27 +480,14 @@ module.exports = function(app){
   app.post('/api/email/video', function(req, res){
     console.log(req.body);
     // var transporter = nodemailer.createTransport(smtpEmail);
-    // var transporter = nodemailer.createTransport({
-    //   service: 'Gmail',
-    //   auth: {
-    //     user: 'jack.connor83@gmail.com', // Your email id
-    //     pass: 'FreezerP1' // Your password
-    //   }
-    // });
     // var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
     // var smtpEmail = "jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com"
-    // var transporter = nodemailer.createTransport(smtpEmail);
-    var transporter = nodemailer.createTransport("SMTP", {
-      service: "Gmail",
-      auth: {
-         user: process.env.EMAIL,
-         pass: process.env.EMAILPASSWORD
-      }
-    });
-    console.log(process.env);
+
+    // console.log(transporter);
+    var transporter = nodemailer.createTransport(smtpTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com'));
     var mailOptions = {
         from: '"MoPho" <jack.connor83@gmail.com>', // sender address
-        to: req.body.email, // list of receivers
+        to: 'jconnor@global.t-bird.edu', // list of receivers
         subject: 'Your MoPho Video', // Subject line
         text: "Here's your video: "+req.body.videoUrl, // plaintext body
         html: "<b>Here's your video: </b>"+req.body.videoUrl+"<br>(Click to download, on desktop. View-only on most mobile devices.)" // html body
