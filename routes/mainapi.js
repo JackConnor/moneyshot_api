@@ -496,7 +496,7 @@ module.exports = function(app){
       console.log('email sent');
         if(error){
           console.log(error);
-            return;
+          res.json(error);
         }
         console.log(info);
         console.log('Message sent: ' + info.response);
