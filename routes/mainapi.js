@@ -484,10 +484,10 @@ module.exports = function(app){
     // var smtpEmail = "jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com"
 
     // console.log(transporter);
-    var transporter = nodemailer.createTransport(smtpTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com'));
+    var transporter = nodemailer.createTransport(smtpTransport(process.env.SMTP));
     var mailOptions = {
         from: '"MoPho" <jack.connor83@gmail.com>', // sender address
-        to: 'jconnor@global.t-bird.edu', // list of receivers
+        to: req.body.email, // list of receivers
         subject: 'Your MoPho Video', // Subject line
         text: "Here's your video: "+req.body.videoUrl, // plaintext body
         html: "<b>Here's your video: </b>"+req.body.videoUrl+"<br>(Click to download, on desktop. View-only on most mobile devices.)" // html body
