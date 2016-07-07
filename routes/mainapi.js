@@ -680,6 +680,10 @@ module.exports = function(app){
       populate: {
         path: 'photos',
         model: 'Photo',
+        populate: {
+          path: 'transactions',
+          model: "Transaction"
+        }
       }
     })
     .populate('tempVideoCache')
