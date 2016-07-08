@@ -17,6 +17,7 @@ var resumableUpload   = require('node-youtube-resumable-upload');
 var youtubeVideo      = require('youtube-video-api');
 var stripe            = require('stripe')(process.env.STRIPE_TEST_ID);
 var nodemailer        = require('nodemailer');
+var smtpTransport     = require('nodemailer-smtp-transport');
 var cors              = require('cors');
 var json2csv          = require('json2csv');
 
@@ -259,6 +260,13 @@ module.exports = function(app){
     })
   })
 
+  app.get('/api/photo/batch', function(req, res){
+
+    Photo.findOne({_id: req.params.id}, function(err, photo){
+      res.json(photo);
+    })
+  })
+
   //////get all photos from a single user
   app.get('/api/userphoto/:userid', function(req, res){
     var userId = req.params.userid;
@@ -362,6 +370,7 @@ module.exports = function(app){
   })
 
   app.post('/api/accepted/savedPhoto', function(req, res){
+    console.log(req.body);
     Photo.findOne({_id: req.body._id}, function(err, data){
       console.log(data);
       data.status = req.body.status;
@@ -465,6 +474,35 @@ module.exports = function(app){
 
   ///////////////end photo db calls////////////////////
   /////////////////////////////////////////////////////
+
+
+  ////////call to send a users vidoe to their email address
+  app.post('/api/email/video', function(req, res){
+    console.log(req.body);
+    // var transporter = nodemailer.createTransport(smtpEmail);
+    // var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
+    // var smtpEmail = "jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com"
+
+    // console.log(transporter);
+    var transporter = nodemailer.createTransport(smtpTransport(process.env.SMTP));
+    var mailOptions = {
+        from: '"MoPho" <jack.connor83@gmail.com>', // sender address
+        to: req.body.email, // list of receivers
+        subject: 'Your MoPho Video', // Subject line
+        text: "Here's your video: "+req.body.videoUrl, // plaintext body
+        html: "<b>Here's your video: </b>"+req.body.videoUrl+"<br>(Click to download, on desktop. View-only on most mobile devices.)" // html body
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+      console.log('email sent');
+        if(error){
+          console.log(error);
+          res.json(error);
+        }
+        console.log(info);
+        console.log('Message sent: ' + info.response);
+        res.json('email sent')
+    });
+  })
 
   /////////////////////////////////////
   /////////transaction calls///////////
@@ -610,6 +648,24 @@ module.exports = function(app){
     var decodedToken = jwt.verify(req.params.token, process.env.JWT_SECRET);
     res.json(decodedToken);
   })
+
+  app.post('/api/checktokensignin', function(req, res){
+    console.log(req.body);
+    console.log(typeof req.body.token);
+    var token = req.body.token;
+    console.log(token);
+    if(token !== null && token !== "null"){
+      var decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      console.log(decodedToken);
+      var newToken = jwt.sign({userId: decodedToken.userId, active: true}, process.env.JWT_SECRET);
+      console.log(newToken);
+      res.json(newToken);
+    }
+    else {
+      console.log('nope');
+      res.json('no token');
+    }
+  })
   ///////////////end Authorization calls///////////////
   /////////////////////////////////////////////////////
 
@@ -624,6 +680,10 @@ module.exports = function(app){
       populate: {
         path: 'photos',
         model: 'Photo',
+        populate: {
+          path: 'transactions',
+          model: "Transaction"
+        }
       }
     })
     .populate('tempVideoCache')

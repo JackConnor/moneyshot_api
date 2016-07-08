@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 app.use(passport.session());
 var router = require('./routes/mainapi.js')(app);
-var cms = require('../moneyshot_cms_v2/server.js');
+// var cms = require('../moneyshot_cms_v2/server.js');
 // require('./passport.js')(passport);
 app.use(function(req, res, next) {
   console.log('=============', req.path)
@@ -64,7 +64,7 @@ if (app.get('env') === 'development') {
       error: err
     });
   });
-}
+}    
 
 // production error handler
 // no stacktraces leaked to user
