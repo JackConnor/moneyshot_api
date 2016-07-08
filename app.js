@@ -39,7 +39,7 @@ var cms = require('../moneyshot_cms_v2/server.js');
 app.use(function(req, res, next) {
   console.log('=============', req.path)
   if (req.path == '/cms' ) {
-    res.redirect('http://localhost:5000/')
+    res.redirect('http://45.55.24.234:5000/')
     return
   }
   next()
