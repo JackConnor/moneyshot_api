@@ -7,7 +7,6 @@ var bcrypt            = require('bcrypt');
 var upload            = multer({dest: './routes/uploads/'})
 var cloudinary        = require('cloudinary');
 var jwt               = require('jsonwebtoken');
-var youtube           = require('youtube-api');
 var fs                = require('fs');
 var opn               = require('opn');
 var Lien              = require('lien');
