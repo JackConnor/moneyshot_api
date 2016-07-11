@@ -485,6 +485,7 @@ module.exports = function(app){
           user.tempPhotoCache.push({type: 'photo', link: result.secure_url, thumb: thumbResult.secureUrl});
           user.save(function(err, savedUser){
             console.log(savedUser);
+            fs.unlink("./routes/uploads/"+filename)
             res.json(savedUser);
           })
         })
