@@ -430,13 +430,15 @@ module.exports = function(app){
     var destination = req.files[0].destination;
     var filePath = destination + filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-      console.log(filename);
-      var thumbFilename = result.secure_url.split('').slice(0, result.secure_url.length-4).join('')+'.jpg';
-      console.log(filename);
-      console.log(result.secure_url);
-      console.log(thumbFilename);
-      fs.unlink('./routes/uploads/'+filename);
-      res.json(result.secure_url)
+      cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
+        console.log(filename);
+        var thumbFilename = result.secure_url.split('').slice(0, result.secure_url.length-4).join('')+'.jpg';
+        console.log(filename);
+        console.log(result.secure_url);
+        console.log(thumbFilename);
+        fs.unlink('./routes/uploads/'+filename);
+        res.json(result.secure_url)
+      }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
     }, { resource_type: "video"});
   })
 
@@ -469,6 +471,35 @@ module.exports = function(app){
         });
       })
     }, { resource_type: "video"});
+  })
+
+  app.post('/api/temp/photo', upload.array('file', 20), function(req, res){
+    var filename = req.files[0].filename;
+    cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+
+      cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
+        User.findOne({"_id":req.body.userId}, function(err, user){
+          console.log(user);
+          // user.tempPhotoCache = [];
+          console.log(user);
+          user.tempPhotoCache.push({type: 'photo', link: result.secure_url, thumb: thumbResult.secureUrl});
+          user.save(function(err, savedUser){
+            console.log(savedUser);
+            res.json(savedUser);
+          })
+        })
+      }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
+    })
+  })
+
+  app.get('/api/erase/temp/photos/:userId', function(req, res){
+    console.log('in temp');
+    User.findOne({"_id":req.params.userId}, function(err, user){
+      user.tempPhotoCache = [];
+      user.save(function(err, savedUser){
+        res.json(savedUser);
+      })
+    })
   })
 
   ///////////////end photo db calls////////////////////
@@ -531,15 +562,6 @@ module.exports = function(app){
     submission.price = 0;
     submission.rejectedPhotosLength = 0;
     submission.status = "pending";
-
-    // Update metaData.location using googlePLaces API
-    // if ( req.body.metaData.latitude && req.body.metaData.longitude ) {
-    //       googlePlacesInfo( {
-    //         id: submission._id,
-    //         latitude: req.body.metaData.latitude,
-    //         longittude: req.body.metaData.longitude
-    //       } )
-    // }
     for (var i = 0; i < req.body.photos.length; i++) {
       if(req.body.photos[i] !== undefined){
         submission.photos[i] = req.body.photos[i];
