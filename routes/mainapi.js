@@ -474,15 +474,17 @@ module.exports = function(app){
   })
 
   app.post('/api/temp/photo', upload.array('file', 20), function(req, res){
+    console.log('yooooooooooooooooo');
     var filename = req.files[0].filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-
+      console.log('cloud 1');
       cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
+        console.log('cloud 2');
         User.findOne({"_id":req.body.userId}, function(err, user){
           console.log(user);
           // user.tempPhotoCache = [];
           console.log(user);
-          user.tempPhotoCache.push({type: 'photo', link: result.secure_url, thumb: thumbResult.secureUrl});
+          user.tempPhotoCache.push({type: 'photo', link: result.secure_url, thumb: thumbResult.secure_url});
           user.save(function(err, savedUser){
             console.log(savedUser);
             fs.unlink("./routes/uploads/"+filename)
@@ -491,6 +493,18 @@ module.exports = function(app){
         })
       }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
     })
+  })
+
+  app.post('/api/temp/photo/http', function(req, res){
+    console.log('yaaaa');
+    res.json('heyyyy')
+    // User.findOne({"_id":req.body.userId}, function(err, user){
+    //   user.tempPhotoCache.push({type: 'photo', link: req.body.photo, thumb: req.body.thumb});
+    //   user.save(function(err, savedUser){
+    //     console.log(savedUser);
+    //     res.json(savedUser);
+    //   })
+    // })
   })
 
   app.get('/api/erase/temp/photos/:userId', function(req, res){
