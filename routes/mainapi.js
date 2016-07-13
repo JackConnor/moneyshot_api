@@ -496,19 +496,19 @@ module.exports = function(app){
   })
 
   app.post('/api/temp/photo/http', function(req, res){
-    console.log('yaaaa');
-    res.json('heyyyy')
-    // User.findOne({"_id":req.body.userId}, function(err, user){
-    //   user.tempPhotoCache.push({type: 'photo', link: req.body.photo, thumb: req.body.thumb});
-    //   user.save(function(err, savedUser){
-    //     console.log(savedUser);
-    //     res.json(savedUser);
-    //   })
-    // })
+    // console.log('yaaaa');
+    // res.json('heyyyy')
+    User.findOne({"_id":req.body.userId}, function(err, user){
+      user.tempPhotoCache.push({type: 'photo', link: req.body.photo, thumb: req.body.thumb});
+      user.save(function(err, savedUser){
+        console.log(savedUser);
+        res.json(savedUser);
+      })
+    })
   })
 
   app.get('/api/erase/temp/photos/:userId', function(req, res){
-    console.log('in temp');
+    console.log('in temp and erasing');
     User.findOne({"_id":req.params.userId}, function(err, user){
       user.tempPhotoCache = [];
       user.save(function(err, savedUser){
