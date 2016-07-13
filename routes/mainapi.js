@@ -156,7 +156,7 @@ module.exports = function(app){
           fs.unlink("./routes/uploads/"+filename)
           var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
           res.json(photoObj);
-        }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
+        }, {gravity: "face", width: 150, angle: 90, height: 150, crop: "fill", gravity: 'center'});
       }, {width: 1920, height: 1080, angle: 90, crop: 'crop'});
     }
     else if(req.body.orientation === 'left'){
@@ -166,7 +166,7 @@ module.exports = function(app){
           fs.unlink("./routes/uploads/"+filename)
           var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
           res.json(photoObj);
-        }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
+        }, {gravity: "face", width: 150, angle: 270, height: 150, crop: "fill", gravity: 'center'});
       }, {width: 1920, height: 1080, angle: 270, crop: 'crop'});
     }
   })
