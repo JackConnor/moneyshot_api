@@ -162,7 +162,7 @@ module.exports = function(app){
           var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
           res.json(photoObj);
         }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
-      }, {width: 1350, height: 1080, angle: 90, x: 290, crop: 'crop'});
+      }, {width: 1920, height: 1080, angle: 90, crop: 'crop'});
     }
     else if(req.body.orientation === 'left'){
       console.log('left or right');
@@ -173,7 +173,7 @@ module.exports = function(app){
           var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
           res.json(photoObj);
         }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
-      }, {width: 1350, height: 1080, angle: 270, x: 290, crop: 'crop'});
+      }, {width: 1920, height: 1080, angle: 270, crop: 'crop'});
     }
   })
 
