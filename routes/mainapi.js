@@ -103,9 +103,6 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
-    console.log(req.body);
-    console.log(req.params);
-    console.log(req.files);
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
     var filePath = destination + filename;
@@ -143,7 +140,6 @@ module.exports = function(app){
     // }
     //////if orientation is portrait
     if(req.body.orientation === 'portrait'){
-      console.log('portrait');
       cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
         // console.log(result);
         cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
@@ -151,10 +147,9 @@ module.exports = function(app){
           var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
           res.json(photoObj);
         }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
-      }, {width: 1080, height: 1350, x: 290, crop: 'crop'});
+      }, {width: 1080, height: 1350, y: 290, crop: 'crop'});
     }
     else if(req.body.orientation === 'right'){
-      console.log('left or right');
       cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
         // console.log(result);
         cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
@@ -165,7 +160,6 @@ module.exports = function(app){
       }, {width: 1920, height: 1080, angle: 90, crop: 'crop'});
     }
     else if(req.body.orientation === 'left'){
-      console.log('left or right');
       cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
         // console.log(result);
         cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
@@ -200,7 +194,7 @@ module.exports = function(app){
     else {
       var thumbnail = req.body.thumbnail;
     }
-    Photo.create({url: url, thumbnail: thumbnail, date: new Date(), status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId}, function(err, newPhoto){
+    Photo.create({url: url, thumbnail: thumbnail, date: new Date(), status: "submitted for sale", isVideo: req.body.isVid, creator: req.body.userId, orientation: req.body.orientation}, function(err, newPhoto){
       console.log(newPhoto);
       User.findOne({_id:req.body.userId}, function(err, user){
         user.photos.push(newPhoto._id);

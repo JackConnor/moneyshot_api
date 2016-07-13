@@ -13,6 +13,7 @@ var photoSchema = new Schema({
   ,status: String
   ,price: Number
   ,date: Date
+  ,orientation: String
 })
 
 module.exports = mongoose.model('Photo', photoSchema);
