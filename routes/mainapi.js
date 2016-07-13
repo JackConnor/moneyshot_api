@@ -103,52 +103,78 @@ module.exports = function(app){
   })
 
   app.post('/api/newimage', upload.array('file', 1), function(req, res){
+    console.log(req.body);
+    console.log(req.params);
     console.log(req.files);
     var filename = req.files[0].filename;
     var destination = req.files[0].destination;
     var filePath = destination + filename;
-    var width = function(){
-      if(req.body.cloudCropImageWidth){
-        return req.body.cloudCropImageWidth;
-      }
-      else {
-        return req.body.naturalWidth;
-      }
+    // var width = function(){
+    //   if(req.body.cloudCropImageWidth){
+    //     return req.body.cloudCropImageWidth;
+    //   }
+    //   else {
+    //     return req.body.naturalWidth;
+    //   }
+    // }
+    // var height = function(){
+    //   if(req.body.cloudCropImageHeight){
+    //     return parseInt(req.body.cloudCropImageHeight);
+    //   }
+    //   else {
+    //     return parseInt(req.body.naturalHeight);
+    //   }
+    // }
+    // var offsetX = function(){
+    //   if(req.body.cloudCropImageX){
+    //     return parseInt(req.body.cloudCropImageX);
+    //   }
+    //   else {
+    //     return 0;
+    //   }
+    // }
+    // var offsetY = function(){
+    //   if(req.body.cloudCropImageY){
+    //     return parseInt(req.body.cloudCropImageY);
+    //   }
+    //   else {
+    //     return 0;
+    //   }
+    // }
+    //////if orientation is portrait
+    if(req.body.orientation === 'portrait'){
+      console.log('portrait');
+      cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+        // console.log(result);
+        cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
+          fs.unlink("./routes/uploads/"+filename)
+          var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
+          res.json(photoObj);
+        }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
+      }, {width: 1080, height: 1350, x: 290, crop: 'crop'});
     }
-    var height = function(){
-      if(req.body.cloudCropImageHeight){
-        return parseInt(req.body.cloudCropImageHeight);
-      }
-      else {
-        return parseInt(req.body.naturalHeight);
-      }
+    else if(req.body.orientation === 'right'){
+      console.log('left or right');
+      cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+        // console.log(result);
+        cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
+          fs.unlink("./routes/uploads/"+filename)
+          var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
+          res.json(photoObj);
+        }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
+      }, {width: 1350, height: 1080, angle: 90, x: 290, crop: 'crop'});
     }
-    var offsetX = function(){
-      if(req.body.cloudCropImageX){
-        return parseInt(req.body.cloudCropImageX);
-      }
-      else {
-        return 0;
-      }
+    else if(req.body.orientation === 'left'){
+      console.log('left or right');
+      cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
+        // console.log(result);
+        cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
+          fs.unlink("./routes/uploads/"+filename)
+          var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
+          res.json(photoObj);
+        }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
+      }, {width: 1350, height: 1080, angle: 270, x: 290, crop: 'crop'});
     }
-    var offsetY = function(){
-      if(req.body.cloudCropImageY){
-        return parseInt(req.body.cloudCropImageY);
-      }
-      else {
-        return 0;
-      }
-    }
-    cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
-      console.log(result);
-      cloudinary.uploader.upload("./routes/uploads/"+filename, function(thumbResult) {
-        console.log(thumbResult);
-        fs.unlink("./routes/uploads/"+filename)
-        var photoObj = {secure_url: result.secure_url, thumbnail: thumbResult.secure_url};
-        console.log(photoObj);
-        res.json(photoObj);
-      }, {gravity: "face", width: 150, height: 150, crop: "fill", gravity: 'center'});
-    }, {width: 1080, height: 1350, y: 290, crop: 'crop'});
   })
 
   ///////function to convert a photo for cropping
