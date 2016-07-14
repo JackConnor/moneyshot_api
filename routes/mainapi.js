@@ -519,6 +519,7 @@ module.exports = function(app){
   })
 
   app.post('/api/temp/photo', upload.array('file', 20), function(req, res){
+    console.log(req.body);
     console.log('yooooooooooooooooo');
     var filename = req.files[0].filename;
     cloudinary.uploader.upload("./routes/uploads/"+filename, function(result) {
@@ -529,7 +530,7 @@ module.exports = function(app){
           console.log(user);
           // user.tempPhotoCache = [];
           console.log(user);
-          user.tempPhotoCache.push({type: 'photo', link: result.secure_url, thumb: thumbResult.secure_url});
+          user.tempPhotoCache.push({type: 'photo', link: result.secure_url, thumb: thumbResult.secure_url, orientation: req.body.orientation});
           user.save(function(err, savedUser){
             console.log(savedUser);
             fs.unlink("./routes/uploads/"+filename)
@@ -541,10 +542,11 @@ module.exports = function(app){
   })
 
   app.post('/api/temp/photo/http', function(req, res){
+    console.log(req.body);
     // console.log('yaaaa');
     // res.json('heyyyy')
     User.findOne({"_id":req.body.userId}, function(err, user){
-      user.tempPhotoCache.push({type: 'photo', link: req.body.photo, thumb: req.body.thumb});
+      user.tempPhotoCache.push({type: 'photo', link: req.body.photo, thumb: req.body.thumb, orientation: req.body.orientation});
       user.save(function(err, savedUser){
         console.log(savedUser);
         res.json(savedUser);
