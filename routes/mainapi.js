@@ -415,7 +415,7 @@ module.exports = function(app){
 
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
-    console.log(req.body);
+    console.log('in rejection');
     Photo.findOne({_id: req.body.photoId}, function(err, photo){
       if(photo){
         photo.status = 'rejected';
@@ -423,29 +423,24 @@ module.exports = function(app){
           Submission.findOne({'_id': req.body.submissionId})
           .populate('photos')
           .exec(function(err, submission){
-            console.log("----------------------");
-            console.log("----------------------");
-            console.log("----------------------");
-            if(submission.rejectedPhotosLength){
+            if(submission.rejectedPhotosLength > 0){
               submission.rejectedPhotosLength++
             }
             else {
               submission.rejectedPhotosLength = 1;
             }
+            console.log(submission.rejectedPhotosLength);
             //////thsi check that submission isn't all processed
-            var stillPendingCount = submission.photos.length;
-            console.log(stillPendingCount);
-            for (var i = 0; i < submission.photos.length; i++) {
-              console.log(i);
-              console.log(submission.photos[i].status);
-              if(submission.photos[i].status === 'submitted for sale'){
-                stillPendingCount--;
-              }
-              if(i==submission.photos.length-1 && stillPendingCount === submission.photos.length){
-                submission.status = "completely processed";
-                console.log('donezoooooooooooo!!!!!!!!!!');
-              }
-            }
+            // var stillPendingCount = submission.photos.length;
+            // for (var i = 0; i < submission.photos.length; i++) {
+            //   if(submission.photos[i].status === 'submitted for sale' || submission.photos[i].status === 'rejected'){
+            //     stillPendingCount--;
+            //   }
+            //   if(i==submission.photos.length-1 && stillPendingCount === submission.photos.length){
+            //     submission.status = "completely processed";
+            //     console.log('donezoooooooooooo!!!!!!!!!!');
+            //   }
+            // }
             submission.save(function(err, newSubmission){
               res.json(newSubmission);
             })
