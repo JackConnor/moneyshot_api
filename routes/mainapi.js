@@ -401,6 +401,7 @@ module.exports = function(app){
 
   /////rejected photo
   app.post('/api/reject/photo', function(req, res){
+    console.log(req.body);
     Photo.findOne({_id: req.body.photoId}, function(err, photo){
       if(photo){
         photo.status = 'rejected';
@@ -491,6 +492,21 @@ module.exports = function(app){
         });
       })
     }, { resource_type: "video"});
+  })
+
+  app.post('/api/delete/temp/video', function(req, res){
+    User.findOne({'_id': req.body.userId}, function(err, user){
+      console.log(user);
+      for (var i = 0; i < user.tempVideoCache.length; i++) {
+        if(user.tempVideoCache[i]._id === req.body.videoId){
+          user.tempVideoCache.splice(i, 1);
+          user.save(function(err, upUser){
+            console.log(upUser);
+            res.json(upUser)
+          })
+        }
+      }
+    })
   })
 
   app.post('/api/temp/photo', upload.array('file', 20), function(req, res){
