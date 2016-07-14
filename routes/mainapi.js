@@ -242,30 +242,30 @@ module.exports = function(app){
               console.log('saved');
               console.log('saved');
               console.log(savedSub);
-              var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
-              var mailOptions = {
-                  from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
-                  to: photo.creator.email, // list of receivers
-                  subject: 'Sold photo! ✔', // Subject line
-                  text: 'Your photo, ' + photo.url + ' was sold for $' + price , // plaintext body
-                  html: '<b>Your photo, ' + photo.url + ' was sold for $' + price + ' Here is a horse 🐴</b>' // html body
-              };
-
-              transporter.sendMail(mailOptions, function(error, info){
-                  if(error){
-                    console.log(error);
-                    res.json({
-                      message:'Error sending email',
-                      error: error
-                    })
-                    throw error
-                  }
-                  res.json({
-                    message: 'Success',
-                    photo: photo
-                  })
-                  console.log('Message sent to ' + photo.creator.email + ': ' + info.response);
-              });
+              // var transporter = nodemailer.createTransport('smtps://jack.connor83%40gmail.com:FreezerP1@smtp.gmail.com');
+              // var mailOptions = {
+              //     from: '"Fred Foo 👥" <jack.connor83@gmail.com>', // sender address
+              //     to: photo.creator.email, // list of receivers
+              //     subject: 'Sold photo! ✔', // Subject line
+              //     text: 'Your photo, ' + photo.url + ' was sold for $' + price , // plaintext body
+              //     html: '<b>Your photo, ' + photo.url + ' was sold for $' + price + ' Here is a horse 🐴</b>' // html body
+              // };
+              //
+              // transporter.sendMail(mailOptions, function(error, info){
+              //     if(error){
+              //       console.log(error);
+              //       res.json({
+              //         message:'Error sending email',
+              //         error: error
+              //       })
+              //       throw error
+              //     }
+              //     res.json({
+              //       message: 'Success',
+              //       photo: photo
+              //     })
+              //     console.log('Message sent to ' + photo.creator.email + ': ' + info.response);
+              // });
             })
           })
 
