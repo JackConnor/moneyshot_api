@@ -15,7 +15,7 @@ var userSchema = new Schema({
   ,lastname: String
   ,email: String
   ,passwordDigest: String
-  ,tempVideoCache: [{type: Schema.Types.ObjectId, ref: "Photo"}]
+  ,tempVideoCache: [{"videoId": {type: Schema.Types.ObjectId, ref: "Photo"}, 'orientation': String}]
   ,tempPhotoCache: Array
 })
 

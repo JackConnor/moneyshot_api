@@ -479,6 +479,7 @@ module.exports = function(app){
     var filename = req.files[0].filename;
     var userId = req.body.userId;
     var tempVideo = new Photo();
+    var orientation = req.body.orientation;
     tempVideo.creator = userId;
     tempVideo.isBoolean = true;
     tempVideo.date = new Date();
@@ -493,9 +494,10 @@ module.exports = function(app){
         console.log(savedVideo);
         User.findOne({'_id':userId}, function(err, user){
           console.log(user);
-          user.tempVideoCache.push(savedVideo._id);
+          user.tempVideoCache.push({videoId: savedVideo._id, orientation: orientation});
           fs.unlink('./routes/uploads/'+filename);
           user.save(function(err, newUser){
+            console.log(newUser);
             res.json(newUser);
           })
         });
@@ -504,12 +506,20 @@ module.exports = function(app){
   })
 
   app.post('/api/delete/temp/video', function(req, res){
+    console.log('start body');
+    console.log(req.body);
+    console.log('end body');
     User.findOne({'_id': req.body.userId}, function(err, user){
-      console.log(user);
+      console.log('video cache');
+      console.log(user.tempVideoCache);
       for (var i = 0; i < user.tempVideoCache.length; i++) {
-        if(user.tempVideoCache[i]._id === req.body.videoId){
+        console.log(user.tempVideoCache[i].videoId);
+        console.log(req.body.videoId);
+        if(user.tempVideoCache[i].videoId == req.body.videoId){
+          console.log('found it');
           user.tempVideoCache.splice(i, 1);
           user.save(function(err, upUser){
+            console.log('updated user');
             console.log(upUser);
             res.json(upUser)
           })
@@ -769,7 +779,7 @@ module.exports = function(app){
         }
       }
     })
-    .populate('tempVideoCache')
+    .populate('tempVideoCache.videoId')
     // .populate({
     //   path: 'tempVideoCache',
     //   model: 'Photo'
