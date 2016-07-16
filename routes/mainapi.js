@@ -652,6 +652,7 @@ module.exports = function(app){
         user.submissions.push(newSub._id);
         user.tempVideoCache = [];
         user.save(function(updatedUser){
+          console.log(updatedUser);
           res.json(newSub)
         })
       })
