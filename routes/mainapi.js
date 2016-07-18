@@ -506,16 +506,15 @@ module.exports = function(app){
   })
 
   app.post('/api/delete/temp/video', function(req, res){
-    console.log('start body');
-    console.log(req.body);
-    console.log('end body');
     User.findOne({'_id': req.body.userId}, function(err, user){
-      console.log('video cache');
-      console.log(user.tempVideoCache);
       for (var i = 0; i < user.tempVideoCache.length; i++) {
-        console.log(user.tempVideoCache[i].videoId);
-        console.log(req.body.videoId);
-        if(user.tempVideoCache[i].videoId == req.body.videoId){
+        console.log('i');
+        var cacheVid = parseInt(user.tempVideoCache[i].videoId);
+        var sentVid = parseInt(req.body.videoId.videoId);
+        console.log(cacheVid);
+        console.log(sentVid);
+
+        if(sentVid === cacheVid){
           console.log('found it');
           user.tempVideoCache.splice(i, 1);
           user.save(function(err, upUser){
