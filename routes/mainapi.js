@@ -505,25 +505,57 @@ module.exports = function(app){
     }, { resource_type: "video"});
   })
 
+  /////single erasure
   app.post('/api/delete/temp/video', function(req, res){
+    var eraseCount = 0;
     User.findOne({'_id': req.body.userId}, function(err, user){
-      for (var i = 0; i < user.tempVideoCache.length; i++) {
-        console.log('i');
-        var cacheVid = parseInt(user.tempVideoCache[i].videoId);
-        var sentVid = parseInt(req.body.videoId.videoId);
-        console.log(cacheVid);
-        console.log(sentVid);
+      var length = user.tempVideoCache.length;
+      // console.log(user.tempVideoCache);
+      for (var i = 0; i < length; i++) {
+        if(user.tempVideoCache[i]){
+          var cacheVid = user.tempVideoCache[i].videoId.toString();
+          var sentVid = req.body.videoId.toString();
+          if(sentVid === cacheVid){
+            user.tempVideoCache.splice(i, 1);
+            user.save(function(err, upUser){
+              res.json(upUser)
+            })
+          }
+        }
+      }
+    })
+  })
 
-        if(sentVid === cacheVid){
-          console.log('found it');
-          user.tempVideoCache.splice(i, 1);
-          user.save(function(err, upUser){
-            console.log('updated user');
-            console.log(upUser);
-            res.json(upUser)
+  /////batch erasure
+  app.post('/api/delete/batch/video/temp', function(req, res){
+    User.findOne({'_id': req.body.userId}, function(err, user){
+      var vidLength = req.body.videos.length;
+      console.log('video length is: '+vidLength);
+      var cacheLength = user.tempVideoCache.length;
+      console.log('cacheLength is: '+cacheLength);
+      for (var i = 0; i < vidLength; i++) {
+        var currentFrontendVid = req.body.videos[i].videoId.toString();
+        console.log(currentFrontendVid);
+        for (var k = 0; k < cacheLength; k++) {
+          if(user.tempVideoCache[k]){
+            var currentCache = user.tempVideoCache[k].videoId.toString();
+            console.log(currentCache);
+            console.log(' ');
+
+            if(currentFrontendVid === currentCache){
+              console.log('got on');
+              user.tempVideoCache.splice(k, 1);
+            }
+          }
+        }
+        if(i === vidLength-1){
+          user.save(function(upUser){
+            console.log('upUser');
+            res.json(upUser);
           })
         }
       }
+
     })
   })
 
